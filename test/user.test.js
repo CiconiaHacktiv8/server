@@ -2,17 +2,17 @@ const chai = require('chai')
 const chaiHttp = require('chai-http')
 const expect = chai.expect
 
-// const app = require('../app')
-// const User = require('../models/user')
+const app = require('../app')
+const User = require('../models/user')
 
 chai.use(chaiHttp)
 
 describe('TESTING USER', function() {
-  describe('1. User Register', function() {
-    after(async function() {
-      await User.deleteMany({})
-    })
+  after(async function() {
+    await User.deleteMany({})
+  })
 
+  describe('1. User Register', function() {
     describe('Start create new user', function() {
       it('Should return token with status code 201', async function() {
         const data = {
@@ -21,7 +21,7 @@ describe('TESTING USER', function() {
           password: 'testing',
         }
 
-        const response = chai
+        const response = await chai
           .request(app)
           .post('/register')
           .send(data)
@@ -38,7 +38,7 @@ describe('TESTING USER', function() {
       it('Should return error - (Empty body, code: 400)', async function() {
         const data = {}
 
-        const response = chai
+        const response = await chai
           .request(app)
           .post('/register')
           .send(data)
@@ -47,9 +47,9 @@ describe('TESTING USER', function() {
         expect(response.body).to.be.an('object')
         expect(response.body).to.have.property('errors')
         expect(response.body.errors).to.be.an('array')
-        expect(resposne.body.errors).to.include('Email is required')
-        expect(resposne.body.errors).to.include('Name is required')
-        expect(resposne.body.errors).to.include('Password is required')
+        expect(response.body.errors).to.include('Email is required')
+        expect(response.body.errors).to.include('Name is required')
+        expect(response.body.errors).to.include('Password is required')
       })
 
       it('Should return error - (Duplicate email, code: 400)', async function() {
@@ -59,7 +59,7 @@ describe('TESTING USER', function() {
           password: 'testing',
         }
 
-        const response = chai
+        const response = await chai
           .request(app)
           .post('/register')
           .send(data)
@@ -75,11 +75,14 @@ describe('TESTING USER', function() {
 
   describe('2. User Login', function() {
     before(async function() {
-      await chai.request(app).post({
-        name: 'testing',
-        email: 'testing@email.com',
-        password: 'testing',
-      })
+      await chai
+        .request(app)
+        .post('/register')
+        .send({
+          name: 'testing',
+          email: 'testing@email.com',
+          password: 'testing',
+        })
     })
 
     after(async function() {

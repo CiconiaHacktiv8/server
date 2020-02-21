@@ -9,12 +9,13 @@ class UserCon {
   static login(req, res, next) {
     const errors = []
 
-    if (!req.body.email) errors.push('Email is missing')
-    if (!req.body.password) errors.push('Password is missing')
+    if (!req.body.email) errors.push('Missing email')
+    if (!req.body.password) errors.push('Missing password')
 
     if (errors.length > 0) {
       next({ name: 'BadRequest', messages: errors })
     }
+
     User.findOne({ email: req.body.email })
       .then(user => {
         if (!user) {
