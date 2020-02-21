@@ -29,6 +29,10 @@ describe('TESTING USER', function() {
         expect(response).to.have.status(201)
         expect(response.body).to.be.an('object')
         expect(response.body).to.have.property('token')
+        expect(response.body).to.have.property('email')
+        expect(response.body).to.have.property('name')
+        expect(response.body.email).to.be.equal(data.email)
+        expect(response.body.name).to.be.equal(data.name)
       })
 
       it('Should return error - (Empty body, code: 400)', async function() {
@@ -71,9 +75,9 @@ describe('TESTING USER', function() {
 
   describe('2. User Login', function() {
     before(async function() {
-      const newUser = await User.create({
-        email: 'testing@email.com',
+      await chai.request(app).post({
         name: 'testing',
+        email: 'testing@email.com',
         password: 'testing',
       })
     })
@@ -93,6 +97,10 @@ describe('TESTING USER', function() {
         expect(response.body).to.be.an('object')
         expect(response.body).to.have.property('token')
         expect(response.body.token).to.be.a('string')
+        expect(response.body).to.have.property('email')
+        expect(response.body).to.have.property('name')
+        expect(response.body.email).to.be.equal('testing@email.com')
+        expect(response.body.name).to.be.equal('testing')
       })
 
       it('Should return error - (missing body, code: 400)', async function() {
