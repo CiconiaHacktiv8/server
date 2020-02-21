@@ -28,7 +28,12 @@ class UserCon {
 
         const token = generateToken(user)
 
-        res.json({ token, name: user.name, email: user.email })
+        res.json({
+          token,
+          name: user.name,
+          email: user.email,
+          point: user.point,
+        })
       })
       .catch(next)
   }
@@ -42,7 +47,14 @@ class UserCon {
       .then(user => {
         const token = generateToken(user)
 
-        res.status(201).json({ token, name: user.name, email: user.email })
+        res
+          .status(201)
+          .json({
+            token,
+            name: user.name,
+            email: user.email,
+            point: user.point,
+          })
       })
       .catch(next)
   }
