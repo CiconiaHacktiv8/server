@@ -1,10 +1,9 @@
 const express = require('express')
 const route = express.Router()
-const user = require('./user')
 
+const UserController = require('../controllers/UserCon')
 
-route.use('/users',user)
-
-
+route.use('/login', UserController.login)
+route.use('/register', UserController.register)
 
 module.exports = route
