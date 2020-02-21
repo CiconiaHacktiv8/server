@@ -19,7 +19,6 @@ describe('TESTING USER', function() {
           email: 'testing@email.com',
           name: 'testing',
           password: 'testing',
-          location: 'Indonesia',
         }
 
         const response = chai
@@ -47,7 +46,6 @@ describe('TESTING USER', function() {
         expect(resposne.body.errors).to.include('Email is required')
         expect(resposne.body.errors).to.include('Name is required')
         expect(resposne.body.errors).to.include('Password is required')
-        expect(resposne.body.errors).to.include('Location is required')
       })
 
       it('Should return error - (Duplicate email, code: 400)', async function() {
@@ -55,7 +53,6 @@ describe('TESTING USER', function() {
           email: 'testing@email.com',
           name: 'testing',
           password: 'testing',
-          location: 'Indonesia',
         }
 
         const response = chai
@@ -78,7 +75,6 @@ describe('TESTING USER', function() {
         email: 'testing@email.com',
         name: 'testing',
         password: 'testing',
-        location: 'Indonesia',
       })
     })
 
@@ -97,7 +93,6 @@ describe('TESTING USER', function() {
         expect(response.body).to.be.an('object')
         expect(response.body).to.have.property('token')
         expect(response.body.token).to.be.a('string')
-        expect(response.body.token).to.be.equal(newUser.token)
       })
 
       it('Should return error - (missing body, code: 400)', async function() {
