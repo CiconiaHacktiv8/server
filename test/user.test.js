@@ -13,7 +13,7 @@ describe('TESTING USER', function() {
       await User.deleteMany({})
     })
 
-    describe('Create new', function() {
+    describe('Start create new user', function() {
       it('Should return token with status code 201', async function() {
         const data = {
           email: 'testing@email.com',
@@ -71,5 +71,61 @@ describe('TESTING USER', function() {
       })
     })
   })
-  // it will be for testing user login
+
+  describe('2. User Login', function() {
+    before(async function() {
+      const newUser = await User.create({
+        email: 'testing@email.com',
+        name: 'testing',
+        password: 'testing',
+        location: 'Indonesia',
+      })
+    })
+
+    after(async function() {
+      User.deleteMany({})
+    })
+
+    describe('Start login user', function() {
+      it('Should return token with status code 200', async function() {
+        const response = await chai
+          .request(app)
+          .post('/login')
+          .send({ email: 'testing@email.com', password: 'testing' })
+
+        expect(response).to.have.status(200)
+        expect(response.body).to.be.an('object')
+        expect(response.body).to.have.property('token')
+        expect(response.body.token).to.be.a('string')
+        expect(response.body.token).to.be.equal(newUser.token)
+      })
+
+      it('Should return error - (missing body, code: 400)', async function() {
+        const response = await chai
+          .request(app)
+          .post('/login')
+          .send({})
+
+        expect(response).to.have.status(400)
+        expect(response.body).to.be.an('object')
+        expect(response.body).to.have.property('errors')
+        expect(response.body.errors).to.be.an('array')
+        expect(response.body.errors).to.include('Missing email')
+        expect(response.body.errors).to.include('Missing password')
+      })
+
+      it('Should return error - (incorrect email and or passsword, code: 400)', async function() {
+        const response = await chai
+          .request(app)
+          .post('/login')
+          .send({ email: 'wrong@email.com', password: 'wrong password' })
+
+        expect(response).to.have.status(400)
+        expect(response.body).to.be.an('object')
+        expect(response.body).to.have.property('errors')
+        expect(response.body.errors).to.be.an('array')
+        expect(response.body.errors).to.include('Email or password is wrong')
+      })
+    })
+  })
 })
