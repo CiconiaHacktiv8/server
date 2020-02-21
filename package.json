@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "NODE_ENV=test mocha --exit"
   },
   "repository": {
     "type": "git",
@@ -16,5 +16,10 @@
   "bugs": {
     "url": "https://github.com/CiconiaHacktiv8/server/issues"
   },
-  "homepage": "https://github.com/CiconiaHacktiv8/server#readme"
+  "homepage": "https://github.com/CiconiaHacktiv8/server#readme",
+  "dependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "mocha": "^7.0.1"
+  }
 }
