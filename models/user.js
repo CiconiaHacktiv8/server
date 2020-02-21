@@ -29,6 +29,10 @@ const UserSchema = new Schema({
     required: [true, 'Password is required'],
     minlength: [6, 'Min length of password is 6 characters'],
   },
+  point: {
+    type: String,
+    default: 0,
+  },
 })
 
 UserSchema.post('validate', function(user) {
