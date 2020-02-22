@@ -2,22 +2,24 @@ const chai = require('chai')
 const chaiHttp = require('chai-http')
 const expect = chai.expect
 
-// const app = require('../app')
-// const Travel = require('../models/travel')
-// const User = require('../models/user')
+const app = require('../app')
+const Travel = require('../models/travel')
+const User = require('../models/user')
+const { generateToken } = require('../helpers/jwt')
+
+chai.use(chaiHttp)
+
+let user, token
 
 describe('TESTING TRAVEL', function() {
-  let user
-
   before(async function() {
-    user = await chai
-      .request(app)
-      .post('/register')
-      .data({
-        email: 'testing@email.com',
-        name: 'testing',
-        password: 'testing',
-      })
+    user = await User.create({
+      name: 'testing',
+      email: 'testing@email.com',
+      password: 'testing',
+    })
+
+    token = generateToken({ id: user.id })
   })
 
   after(async function() {
@@ -34,13 +36,13 @@ describe('TESTING TRAVEL', function() {
         const data = {
           locationFrom: 'Singapore',
           locationTo: 'Indonesia',
-          departure: new Date(2020, 2, 21),
+          departure: '2020-02-21',
         }
 
-        const response = chai
+        const response = await chai
           .request(app)
           .post('/travels')
-          .set('token', user.body.token)
+          .set('token', token)
           .send(data)
 
         expect(response).to.have.status(201)
@@ -53,10 +55,10 @@ describe('TESTING TRAVEL', function() {
       })
 
       it('should return error - (missing body, code: 400)', async function() {
-        const response = chai
+        const response = await chai
           .request(app)
           .post('/travels')
-          .set('token', user.body.token)
+          .set('token', token)
           .send({})
 
         expect(response).to.have.status(400)
@@ -68,25 +70,26 @@ describe('TESTING TRAVEL', function() {
         expect(response.body.errors).to.include('departure is missing')
       })
 
-      it('should return error - (already have active travel, code: 403)', async function() {
+      it('should return error - (already have active travel, code: 400)', async function() {
         const data = {
           locationFrom: 'Singapore',
           locationTo: 'Indonesia',
-          departure: new Date(2020, 2, 21),
+          departure: '2020-02-21',
         }
 
         await chai
           .request(app)
           .post('/travels')
-          .set('token', user.body.token)
-          .data(data)
-
-        const response = chai
-          .request(app)
-          .post('/travels')
+          .set('token', token)
           .send(data)
 
-        expect(response).to.have.status(403)
+        const response = await chai
+          .request(app)
+          .post('/travels')
+          .set('token', token)
+          .send(data)
+
+        expect(response).to.have.status(400)
         expect(response.body).to.be.an('object')
         expect(response.body).to.have.property('errors')
         expect(response.body.errors).to.be.an('array')
@@ -115,7 +118,7 @@ describe('TESTING TRAVEL', function() {
 
     describe('Start update travel', function() {
       it('should return travel object - (code: 200)', async function() {
-        const response = chai
+        const response = await chai
           .request(app)
           .patch(`/travels/${travel._id}`)
           .set('token', user.body.token)
@@ -151,7 +154,7 @@ describe('TESTING TRAVEL', function() {
 
     describe('Start delete travel', function() {
       it('should return travel object - code(200)', async function() {
-        const response = chai
+        const response = await chai
           .request(app)
           .delete(`/travels/${travel._id}`)
           .set('token', user.body.token)

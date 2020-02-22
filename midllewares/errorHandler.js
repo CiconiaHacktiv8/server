@@ -12,6 +12,14 @@ module.exports = (err, req, res, next) => {
       res.status(400).json({ errors: err.messages })
       break
 
+    case 'NotAuthorze':
+      res.status(401).json({ errors: err.messages })
+      break
+
+    case 'NotFound':
+      res.status(404).json({ errors: err.messages })
+      break
+
     default:
       res.status(500).json(err)
   }
