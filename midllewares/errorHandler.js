@@ -1,4 +1,7 @@
 module.exports = (err, req, res, next) => {
+if(err.status && err.message){
+    res.status(err.status).json({message: [err.message]})
+}
   switch (err.name) {
     case 'ValidationError':
       const errors = []
@@ -11,6 +14,7 @@ module.exports = (err, req, res, next) => {
     case 'BadRequest':
       res.status(400).json({ errors: err.messages })
       break
+    
 
     case 'NotAuthorze':
       res.status(401).json({ errors: err.messages })
