@@ -33,6 +33,41 @@ class CartController {
       .catch(next)
   }
 
+  static getAllCartByUser(req, res, next) {
+    const result = {
+      open: [],
+      offered: [],
+      pendingPurchase: [],
+      pendingDelivery: [],
+    }
+
+    Travel.findOne({ userId: req.payload.id })
+      .then(travel => {
+        if (!travel) {
+          throw { name: 'NotFound', messages: ['Travel not found'] }
+        }
+
+        return Cart.find({ travelId: travel.id, status: 'open' })
+      })
+      .then(carts => {
+        results.open = carts
+
+        return Cart.find({ buyerId: req.payload.id })
+      })
+      .then(carts => {
+        result.offered = carts.filter(cart => cart.status === 'offered')
+        result.pendingPurchase = carts.filter(
+          cart => cart.status === 'pending purchase',
+        )
+        result.pendingDelivery = carts.filter(
+          cart => cart.status === 'pending delivery',
+        )
+
+        res.json(result)
+      })
+      .catch(next)
+  }
+
   static addNewCart(req, res, next) {
     Cart.create({
       travelId: req.body.travelId,
