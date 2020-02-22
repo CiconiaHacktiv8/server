@@ -15,6 +15,7 @@ class ItemCon {
     Item.findOne({
       _id: req.params.id,
     })
+      .populate('ownerId', 'email')
       .then(item => {
         res.status(200).json(item)
       })
