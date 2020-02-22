@@ -1,5 +1,6 @@
 // model
 const Item = require('../models/item')
+const Travel = require('../models/travel')
 
 class ItemCon {
   static findAll(req, res, next) {
@@ -23,12 +24,34 @@ class ItemCon {
   }
 
   static create(req, res, next) {
-    req.body.ownerId = req.payload.id
-    Item.create(req.body)
-      .then(item => {
-        res.status(201).json(item)
-      })
-      .catch(next)
+    if (req.body.status === 'travel') {
+      Travel.findOne({ userId: req.payload.id })
+        .then(travel => {
+          if (travel) {
+            // di bikinin
+            req.body.ownerId = req.payload.id
+            Item.create({
+              ...req.body,
+              ownerId: travel.id,
+            })
+              .then(item => {
+                res.status(201).json(item)
+              })
+              .catch(next)
+          } else {
+            // throw error
+            throw { name: 'BadRequest', messages: ['You didnt have travel'] }
+          }
+        })
+        .catch(next)
+    } else {
+      req.body.ownerId = req.payload.id
+      Item.create(req.body)
+        .then(item => {
+          res.status(201).json(item)
+        })
+        .catch(next)
+    }
   }
 
   static remove(req, res, next) {
