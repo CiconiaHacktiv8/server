@@ -23,7 +23,7 @@ class UserCon {
         }
 
         if (!comparePassword(req.body.password, user.password)) {
-          throw { name: 'BadRequest', message: ['Email or password is wrong'] }
+          throw { name: 'BadRequest', messages: ['Email or password is wrong'] }
         }
 
         const token = generateToken({ id: user.id })

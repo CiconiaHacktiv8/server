@@ -26,6 +26,7 @@ const travelSchema = new Schema({
       msg: 'Cant make another travel',
     },
   },
+  itemList: [{ type: Schema.Types.ObjectId, ref: 'Item' }],
 })
 
 const travel = model('Travel', travelSchema)

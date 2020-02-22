@@ -21,6 +21,11 @@ class TravelController {
 
   static getTravel(req, res, next) {
     Travel.findOne({ _id: req.params.travelId })
+      .populate('userId', 'name email point')
+      .populate({
+        path: 'itemList',
+        populate: { path: ownerId, select: 'name email point' },
+      })
       .then(travel => res.json(travel))
       .catch(next)
   }
