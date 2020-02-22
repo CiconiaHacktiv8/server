@@ -1,4 +1,5 @@
 const Cart = require('../models/cart')
+const Travel = require('../models/travel')
 
 class CartController {
   static getAllCarts(req, res, next) {
@@ -10,6 +11,25 @@ class CartController {
   static getCart(req, res, next) {
     Cart.findOne({ _id: req.params.cartId })
       .then(cart => res.json(cart))
+      .catch(next)
+  }
+
+  static getCartWithStatusOpen(req, res, next) {
+    Travel.findOne({ userId: req.payload.id })
+      .then(travel => {
+        if (!travel) {
+          throw { name: 'NotFound', messages: ['Travel not found'] }
+        }
+
+        return Cart.find({ travelId: travel.id, status: 'open' })
+      })
+      .then(carts => res.json(carts))
+      .catch(next)
+  }
+
+  static getCartWithStatusOffered(req, res, next) {
+    Cart.find({ buyerId: req.payload.id, status: 'offered' })
+      .then(carts => res.json(carts))
       .catch(next)
   }
 

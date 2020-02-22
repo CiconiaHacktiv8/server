@@ -2,6 +2,9 @@ const router = require('express').Router()
 const CartController = require('../controllers/cart-controller')
 const { authenticate } = require('../midllewares/auth')
 
+router.get('/open', authenticate, CartController.getCartWithStatusOpen)
+router.get('/offered', authenticate, CartController.getCartWithStatusOffered)
+
 router.get('/', CartController.getAllCarts)
 router.get('/:cartId', CartController.getCart)
 router.post('/', authenticate, CartController.addNewCart)
