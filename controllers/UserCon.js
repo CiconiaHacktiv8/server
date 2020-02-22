@@ -26,7 +26,7 @@ class UserCon {
           throw { name: 'BadRequest', message: ['Email or password is wrong'] }
         }
 
-        const token = generateToken(user)
+        const token = generateToken({ id: user.id })
 
         res.json({
           token,
@@ -45,16 +45,14 @@ class UserCon {
       password: req.body.password,
     })
       .then(user => {
-        const token = generateToken(user)
+        const token = generateToken({ id: user.id })
 
-        res
-          .status(201)
-          .json({
-            token,
-            name: user.name,
-            email: user.email,
-            point: user.point,
-          })
+        res.status(201).json({
+          token,
+          name: user.name,
+          email: user.email,
+          point: user.point,
+        })
       })
       .catch(next)
   }
