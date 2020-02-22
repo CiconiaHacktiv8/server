@@ -93,7 +93,7 @@ describe('TESTING TRAVEL', function() {
         expect(response.body).to.be.an('object')
         expect(response.body).to.have.property('errors')
         expect(response.body.errors).to.be.an('array')
-        expect(response.body.errors).to.include('Travel already exists')
+        expect(response.body.errors).to.include('Cant make another travel')
       })
     })
   })
@@ -101,15 +101,12 @@ describe('TESTING TRAVEL', function() {
   describe('2. Update Travel', function() {
     let travel
     before(async function() {
-      travel = await chai
-        .request(app)
-        .post('/travels')
-        .set('token', user.body.token)
-        .send({
-          locationFrom: 'Singapore',
-          locationTo: 'Indonesia',
-          departure: new Date(2020, 2, 21),
-        })
+      travel = await Travel.create({
+        userId: user.id,
+        locationFrom: 'Singapore',
+        locationTo: 'Indonesia',
+        departure: '2020-02-21',
+      })
     })
 
     after(async function() {
@@ -120,8 +117,8 @@ describe('TESTING TRAVEL', function() {
       it('should return travel object - (code: 200)', async function() {
         const response = await chai
           .request(app)
-          .patch(`/travels/${travel._id}`)
-          .set('token', user.body.token)
+          .patch(`/travels/${travel.id}`)
+          .set('token', token)
           .send({ locationFrom: 'Jawa Tengah' })
 
         expect(response).to.have.status(200)
@@ -138,14 +135,12 @@ describe('TESTING TRAVEL', function() {
   describe('3. Delete Travel', function() {
     let travel
     before(async function() {
-      travel = await chai
-        .request(app)
-        .post('/travels')
-        .send({
-          locationFrom: 'Singapore',
-          locationTo: 'Indonesia',
-          departure: new Date(2020, 2, 21),
-        })
+      travel = await Travel.create({
+        userId: user.id,
+        locationFrom: 'Singapore',
+        locationTo: 'Indonesia',
+        departure: '2020-02-21',
+      })
     })
 
     after(async function() {
@@ -156,8 +151,8 @@ describe('TESTING TRAVEL', function() {
       it('should return travel object - code(200)', async function() {
         const response = await chai
           .request(app)
-          .delete(`/travels/${travel._id}`)
-          .set('token', user.body.token)
+          .delete(`/travels/${travel.id}`)
+          .set('token', token)
 
         expect(response).to.have.status(200)
         expect(response.body).to.be.an('object')

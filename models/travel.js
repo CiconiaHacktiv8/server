@@ -1,4 +1,4 @@
-const { Schema, model } = require('mongoose')
+const { Schema, model, models } = require('mongoose')
 
 const travelSchema = new Schema({
   userId: {
@@ -16,6 +16,15 @@ const travelSchema = new Schema({
   departure: {
     type: Date,
     required: [true, 'departure is missing'],
+    validate: {
+      validator: function(v) {
+        return models.Travel.findOne({ userId: this.userId }).then(travel => {
+          if (travel) return false
+          return true
+        })
+      },
+      msg: 'Cant make another travel',
+    },
   },
 })
 

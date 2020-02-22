@@ -11,14 +11,16 @@ module.exports = {
     try {
       const payload = verifyToken(req.headers.token)
 
-      User.findOne({ _id: payload.id }).then(user => {
-        if (!user) {
-          throw { name: 'BadRequest', messages: ['Bad token'] }
-        }
+      User.findOne({ _id: payload.id })
+        .then(user => {
+          if (!user) {
+            throw { name: 'BadRequest', messages: ['Bad token'] }
+          }
 
-        req.payload = payload
-        next()
-      })
+          req.payload = payload
+          next()
+        })
+        .catch(next)
     } catch (err) {
       next(err)
     }
