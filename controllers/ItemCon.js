@@ -29,10 +29,10 @@ class ItemCon {
         .then(travel => {
           if (travel) {
             // di bikinin
-            req.body.ownerId = req.payload.id
             Item.create({
               ...req.body,
-              ownerId: travel.id,
+              travelId: travel.id,
+              ownerId: req.payload.id,
             })
               .then(item => {
                 res.status(201).json(item)
