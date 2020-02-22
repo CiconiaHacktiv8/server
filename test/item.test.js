@@ -12,7 +12,11 @@ let itemWatcher = ''
 let user = ''
 let itemTravel = ''
 let newUser = ''
+<<<<<<< HEAD
 describe.only('/testing item', function() {
+=======
+describe('TESTING ITEM', function() {
+>>>>>>> test
     before( async function (){
         await  itemModel.deleteMany({name : 'item name'},function(err,data){
             if (err) {
