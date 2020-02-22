@@ -50,7 +50,7 @@ class CartController {
         return Cart.find({ travelId: travel.id, status: 'open' })
       })
       .then(carts => {
-        results.open = carts
+        result.open = carts
 
         return Cart.find({ buyerId: req.payload.id })
       })
