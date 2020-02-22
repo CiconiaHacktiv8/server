@@ -3,25 +3,33 @@ const chaiHttp = require('chai-http')
 const expect = chai.expect
 
 const app = require('../app')
-let itemModel = require('../models/item')
+const itemModel = require('../models/item')
+const userModel = require('../models/user')
 
 chai.use(chaiHttp)
 
 let itemWatcher = ''
 let user = ''
 let itemTravel = ''
-
+let newUser = ''
 describe.only('/testing item', function() {
     before( async function (){
         await  itemModel.deleteMany({name : 'item name'},function(err,data){
             if (err) {
                 console.log(err)
               } else {
-                console.log('delete succsess');
+                console.log('delete item succsess');
               }
         })
-         await chai.request(app)
-            .post('/login')
+        await  userModel.deleteMany({name : 'user'},function(err,data){
+            if (err) {
+                console.log(err)
+              } else {
+                console.log('delete user succsess');
+              }
+        })
+        await chai.request(app)
+            .post('/register')
             .send({
                 name:'user',
                 email:'user@gmail.com',
@@ -31,6 +39,17 @@ describe.only('/testing item', function() {
                 user = data
             })
             .catch(err=>{console.log(err)})
+        await chai.request(app)
+            .post('/register')
+            .send({
+                name:'user',
+                email:'user2@gmail.com',
+                password:'123456'
+            })
+            .then((data) =>{
+                newUser = data
+            })
+            .catch(err=>{console.log(err)})            
     })     
   describe('Post item', function() {
       it('should return created item and status code 201', function(done) {
@@ -74,8 +93,8 @@ describe.only('/testing item', function() {
                     })
                     .then(function(res){
                         expect(res).to.have.status(400)
-                        expect(res.body).to.have.property('message')
-                        expect(res.body.message[0]).to.equal('you must enter item name')
+                        expect(res.body).to.have.property('errors')
+                        expect(res.body.errors[0]).to.equal('you must enter item name')
                         done()
                     })
                     .catch(done)
@@ -96,8 +115,8 @@ describe.only('/testing item', function() {
                     })
                     .then(function(res){
                         expect(res).to.have.status(400)
-                        expect(res.body).to.have.property('message')
-                        expect(res.body.message[0]).to.equal('minimal price is 1000')
+                        expect(res.body).to.have.property('errors')
+                        expect(res.body.errors[0]).to.equal('minimal price is 1000')
                         done()
                     })
                     .catch(done)
@@ -116,8 +135,8 @@ describe.only('/testing item', function() {
                     })
                     .then(function(res){
                         expect(res).to.have.status(400)
-                        expect(res.body).to.have.property('message')
-                        expect(res.body.message[0]).to.equal('you must enter item price')
+                        expect(res.body).to.have.property('errors')
+                        expect(res.body.errors[0]).to.equal('you must enter item price')
                         done()
                     })
                     .catch(done)
@@ -130,7 +149,7 @@ describe.only('/testing item', function() {
                     .set('token',user.body.token)
                     .send({
                         name: 'item name',
-                        price: 500,
+                        price: 99999,
                         quantity: 0,
                         image: 'image url',
                         status: 'travel', // input with travel or watch
@@ -138,8 +157,8 @@ describe.only('/testing item', function() {
                     })
                     .then(function(res){
                         expect(res).to.have.status(400)
-                        expect(res.body).to.have.property('message')
-                        expect(res.body.message[0]).to.equal('minimal quantity is 1')
+                        expect(res.body).to.have.property('errors')
+                        expect(res.body.errors[0]).to.equal('minimal quantity is 1')
                         done()
                     })
                     .catch(done)
@@ -151,7 +170,6 @@ describe.only('/testing item', function() {
                     .send({
                         name: 'item name',
                         price: 99999,
-                        quantity: '',
                         image: 'image url',
                         status: 'travel', // input with travel or watch
                         location: 'location item'
@@ -185,8 +203,8 @@ describe.only('/testing item', function() {
                     })
                     .then(function(res){
                         expect(res).to.have.status(400)
-                        expect(res.body).to.have.property('message')
-                        expect(res.body.message[0]).to.equal('you must enter item image')
+                        expect(res.body).to.have.property('errors')
+                        expect(res.body.errors[0]).to.equal('you must enter item image')
                         done()
                     })
                     .catch(done)
@@ -206,9 +224,9 @@ describe.only('/testing item', function() {
                         location: 'location item'
                     })
                     .then(function(res){
-                        expect(res).to.have.status(404)
-                        expect(res.body).to.have.property('message')
-                        expect(res.body.message[0]).to.equal('user not found')
+                        expect(res).to.have.status(400)
+                        expect(res.body).to.have.property('errors')
+                        expect(res.body.errors[0]).to.equal('invalid token')
                         done()
                     })
                     .catch(done)
@@ -229,8 +247,8 @@ describe.only('/testing item', function() {
                     })
                     .then(function(res){
                         expect(res).to.have.status(400)
-                        expect(res.body).to.have.property('message')
-                        expect(res.body.message[0]).to.equal('you must enter item status')
+                        expect(res.body).to.have.property('errors')
+                        expect(res.body.errors[0]).to.equal('you must enter item status')
                         done()
                     })
                     .catch(done)
@@ -249,8 +267,8 @@ describe.only('/testing item', function() {
                     })
                     .then(function(res){
                         expect(res).to.have.status(400)
-                        expect(res.body).to.have.property('message')
-                        expect(res.body.message[0]).to.equal('you must enter with travel or watch')
+                        expect(res.body).to.have.property('errors')
+                        expect(res.body.errors[0]).to.equal('you must enter with travel or watch')
                         done()
                     })
                     .catch(done)
@@ -271,8 +289,8 @@ describe.only('/testing item', function() {
                     })
                     .then(function(res){
                         expect(res).to.have.status(400)
-                        expect(res.body).to.have.property('message')
-                        expect(res.body.message[0]).to.equal('you must enter item location')
+                        expect(res.body).to.have.property('errors')
+                        expect(res.body.errors[0]).to.equal('you must enter item location')
                         done()
                     })
                     .catch(done)
@@ -334,7 +352,8 @@ describe.only('/testing item', function() {
                 .get(`/items/${itemWatcher.body._id} + 123`)
                 .then(function(res){
                     expect(res).to.have.status(404)
-                    expect(res.body.message).to.equal('item not found')
+                    expect(res.body.errors).to.equal('not found')
+                    done()
                 })
                 .catch(done)
       })
@@ -371,8 +390,8 @@ describe.only('/testing item', function() {
                 })
                 .then(function(res) {
                     expect(res).to.have.status(400)
-                    expect(res.body).to.have.property('message')
-                    expect(res.body.message[0]).to.equal('status item is Travel')
+                    expect(res.body).to.have.property('errors')
+                    expect(res.body.errors[0]).to.equal('status item is Travel')
                     done()
                 })
                 .catch(done)
@@ -382,7 +401,7 @@ describe.only('/testing item', function() {
         it('should return status code 401 when update item with invalid token', function(done) {
             chai.request(app)
                 .put(`/items/${itemWatcher.body._id}`)
-                .set('token',`${user.body.token} + 000`)
+                .set('token', newUser.body.token)
                 .send({
                     quantity: 2,
                     image: 'image url new',
@@ -390,8 +409,8 @@ describe.only('/testing item', function() {
                 })
                 .then(function(res) {
                     expect(res).to.have.status(401)
-                    expect(res.body).to.have.property('message')
-                    expect(res.body.message[0]).to.equal('Not Authorized')
+                    expect(res.body).to.have.property('errors')
+                    expect(res.body.errors[0]).to.equal('Item are not authorize')
                     done()
                 })
                 .catch(done)
@@ -423,8 +442,8 @@ describe.only('/testing item', function() {
             })
             .then(function(res) {
                 expect(res).to.have.status(400)
-                expect(res.body).to.have.property('message')
-                expect(res.body.message[0]).to.equal('status item is Travel')                
+                expect(res.body).to.have.property('errors')
+                expect(res.body.errors[0]).to.equal('status item is Travel')                
                 done()
             })
             .catch(done)

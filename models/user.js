@@ -30,7 +30,7 @@ const UserSchema = new Schema({
     minlength: [6, 'Min length of password is 6 characters'],
   },
   point: {
-    type: String,
+    type: Number,
     default: 0,
   },
 })

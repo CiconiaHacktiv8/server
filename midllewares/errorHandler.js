@@ -1,6 +1,6 @@
 module.exports = (err, req, res, next) => {
 if(err.status && err.message){
-    res.status(err.status).json({message: [err.message]})
+    res.status(err.status).json({errors: [err.message]})
 }
   switch (err.name) {
     case 'ValidationError':
@@ -14,9 +14,24 @@ if(err.status && err.message){
     case 'BadRequest':
       res.status(400).json({ errors: err.messages })
       break
-    
+
+    case 'JsonWebTokenError' : 
+      res.status(400).send({
+              errors : ["invalid token"]
+          })
+      break
+
+    case 'CastError' : 
+      res.status(404).send({
+            errors : "not found"
+        })
+      break      
 
     case 'NotAuthorze':
+      res.status(401).json({ errors: err.messages })
+      break
+    
+    case 'ItemAuthorize':
       res.status(401).json({ errors: err.messages })
       break
 

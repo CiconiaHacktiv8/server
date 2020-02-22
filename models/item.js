@@ -4,26 +4,26 @@ const Schema = mongoose.Schema;
 const ItemSchema = new Schema({
     name: {
         type:String,
-        required:[true,'you must enter your name']
+        required:[true,'you must enter item name']
     },
     price: {
         type:Number,
-        required:[true,'you must enter your price'],
+        required:[true,'you must enter item price'],
         min:[1000,'minimal price is 1000']
     },
     quantity: {
         type:Number,
-        required:[true,'you must enter your quantity'],
-        min:[1,'min stock 1'],
+        min:[1,'minimal quantity is 1'],
         default: 1
     },
     image:{
         type:String,
-        required:[true,'you must enter your image']
+        required:[true,'you must enter item image']
     },
     ownerId:{
         type:Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required:[true,'you must enter item image'],
     },
     status: {
         type: String,
@@ -34,13 +34,14 @@ const ItemSchema = new Schema({
                     } else {
                         return false
                     }
-            }
+            },
+            message: props => `you must enter with travel or watch`
         },
-        required:[true,'you must enter your status']
+        required:[true,'you must enter item status']
     },
     location:{
         type: String,
-        required:[true,'you must enter your location']
+        required:[true,'you must enter item location']
     }
 });
 

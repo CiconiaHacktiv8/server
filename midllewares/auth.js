@@ -1,5 +1,6 @@
 const User = require('../models/user')
 const Travel = require('../models/travel')
+const Item = require('../models/item')
 const { verifyToken } = require('../helpers/jwt')
 
 module.exports = {
@@ -34,6 +35,22 @@ module.exports = {
 
         if (travel.userId != req.payload.id) {
           throw { name: 'NotAuthorize', messages: ['You are not authorzied'] }
+        }
+        next()
+      })
+      .catch(next)
+  },
+  authorizeItem: function(req, res, next) {
+    Item.findOne({ _id: req.params.id })
+      .then(item => {
+        if (!item) {
+          throw { name: 'NotFound', messages: ['Item not found'] }
+        }
+        
+        if (item.ownerId != req.payload.id) {
+          console.log(typeof item.ownerId,'owner id')
+          console.log(typeof req.payload.id, 'iki idneeeeeee')
+          throw { name: 'ItemAuthorize', messages: ['Item are not authorize'] }
         }
         next()
       })
