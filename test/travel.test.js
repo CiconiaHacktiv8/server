@@ -26,7 +26,7 @@ describe('TESTING TRAVEL', function() {
     await User.deleteMany({})
   })
 
-  describe.only('1. Create Travel', function() {
+  describe('1. Create Travel', function() {
     describe('Start create travel', function() {
       afterEach(async function() {
         await Travel.deleteMany({})

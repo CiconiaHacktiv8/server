@@ -16,12 +16,6 @@ const travelSchema = new Schema({
   departure: {
     type: Date,
     required: [true, 'departure is missing'],
-    validate: {
-      validation: departure => {
-        console.log(this.locationFrom)
-      },
-      msg: 'Travel already exists',
-    },
   },
 })
 

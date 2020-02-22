@@ -8,6 +8,7 @@ class TravelController {
   }
 
   static addNewTravel(req, res, next) {
+    console.log('masuk ke sini')
     Travel.create({
       userId: req.payload.id,
       locationFrom: req.body.locationFrom,
