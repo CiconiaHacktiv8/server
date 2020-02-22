@@ -3,6 +3,7 @@ const Travel = require('../models/travel')
 class TravelController {
   static getAllTravels(req, res, next) {
     Travel.find()
+      .populate('userId', 'name email point')
       .then(travels => res.json(travels))
       .catch(next)
   }
