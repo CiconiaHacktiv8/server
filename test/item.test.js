@@ -12,7 +12,7 @@ let itemWatcher = ''
 let user = ''
 let itemTravel = ''
 let newUser = ''
-describe('/testing item', function() {
+describe.only('/testing item', function() {
     before( async function (){
         await  itemModel.deleteMany({name : 'item name'},function(err,data){
             if (err) {
@@ -49,7 +49,19 @@ describe('/testing item', function() {
             .then((data) =>{
                 newUser = data
             })
-            .catch(err=>{console.log(err)})            
+            .catch(err=>{console.log(err)})       
+        await chai.request(app)
+            .post('/travels')
+            .set('token', user.body.token)
+            .send({
+                locationFrom: 'Singapore',
+                locationTo: 'Indonesia',
+                departure: '2020-02-21',
+              })
+            .then((data) =>{
+                console.log('creates travel')
+            })
+            .catch(err=>{console.log(err)})                 
     })     
   describe('Post item', function() {
       it('should return created item and status code 201', function(done) {
@@ -84,7 +96,6 @@ describe('/testing item', function() {
                     .post('/items')
                     .set('token',user.body.token)
                     .send({
-                        name: '',
                         price: 99999,
                         quantity: 1,
                         image: 'image url',
@@ -340,7 +351,7 @@ describe('/testing item', function() {
                     expect(res.body).have.property('price').to.be.a('number')
                     expect(res.body).have.property('quantity').to.be.a('number')
                     expect(res.body).have.property('image').to.be.a('string')
-                    expect(res.body).have.property('ownerId').to.be.a('string')
+                    expect(res.body).have.property('ownerId').to.be.a('object')
                     expect(res.body).have.property('status').to.be.a('string')
                     expect(res.body).have.property('location').to.be.a('string')
                     done()                    

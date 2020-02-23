@@ -48,8 +48,6 @@ module.exports = {
         }
         
         if (item.ownerId != req.payload.id) {
-          console.log(typeof item.ownerId,'owner id')
-          console.log(typeof req.payload.id, 'iki idneeeeeee')
           throw { name: 'ItemAuthorize', messages: ['Item are not authorize'] }
         }
         next()
