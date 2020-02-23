@@ -50,6 +50,10 @@ class CartController {
         return Cart.find({ travelId: travel.id, status: 'open' })
           .populate('buyerId', 'name email point')
           .populate({
+            path: 'itemId',
+            populate: { path: 'ownerId', select: 'name email point' },
+          })
+          .populate({
             path: 'travelId',
             select: 'locationFrom locationTo departure userId',
             populate: { path: 'userId', select: 'name email point' },
@@ -60,6 +64,10 @@ class CartController {
 
         return Cart.find({ buyerId: req.payload.id })
           .populate('buyerId', 'name email point')
+          .populate({
+            path: 'itemId',
+            populate: { path: 'ownerId', select: 'name email point' },
+          })
           .populate({
             path: 'travelId',
             select: 'locationFrom locationTo departure userId',
