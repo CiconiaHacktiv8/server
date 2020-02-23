@@ -48,11 +48,23 @@ class CartController {
         }
 
         return Cart.find({ travelId: travel.id, status: 'open' })
+          .populate('buyerId', 'name email point')
+          .populate({
+            path: 'travelId',
+            select: 'locationFrom locationTo departure userId',
+            populate: { path: 'userId', select: 'name email point' },
+          })
       })
       .then(carts => {
         result.open = carts
 
         return Cart.find({ buyerId: req.payload.id })
+          .populate('buyerId', 'name email point')
+          .populate({
+            path: 'travelId',
+            select: 'locationFrom locationTo departure userId',
+            populate: { path: 'userId', select: 'name email point' },
+          })
       })
       .then(carts => {
         result.offered = carts.filter(cart => cart.status === 'offered')
