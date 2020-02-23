@@ -1,5 +1,4 @@
 module.exports = (err, req, res, next) => {
-  console.log(err)
   if (err.status && err.message) {
     res.status(err.status).json({ errors: [err.message] })
   }

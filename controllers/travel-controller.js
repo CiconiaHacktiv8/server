@@ -24,7 +24,7 @@ class TravelController {
       .populate('userId', 'name email point')
       .populate({
         path: 'itemList',
-        populate: { path: ownerId, select: 'name email point' },
+        populate: { path: 'ownerId', select: 'name email point' },
       })
       .then(travel => res.json(travel))
       .catch(next)
