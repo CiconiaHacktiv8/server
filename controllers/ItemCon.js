@@ -23,6 +23,54 @@ class ItemCon {
       .catch(next)
   }
 
+  static createFromWeb(req, res, next) {
+    console.log('masuk ke sini')
+    let travelResponse, itemResponse
+    if (req.body.status === 'travel') {
+      Travel.findOne({ userId: req.payload.id })
+        .then(travel => {
+          if (travel) {
+            // di bikinin
+            travelResponse = travel
+            Item.create({
+              ...req.body,
+              image: req.body.image
+                ? req.body.image
+                : 'https://via.placeholder.com/150',
+              travelId: travel.id,
+              ownerId: req.payload.id,
+              location: travel.locationFrom,
+            })
+              .then(item => {
+                itemResponse = item
+                travelResponse.itemList.push(item.id)
+                return travelResponse.save({ validateBeforeSave: false })
+              })
+              .then(() => {
+                res.status(201).json(itemResponse)
+              })
+              .catch(next)
+          } else {
+            // throw error
+            throw { name: 'BadRequest', messages: ['You didnt have travel'] }
+          }
+        })
+        .catch(next)
+    } else {
+      req.body.ownerId = req.payload.id
+      Item.create({
+        ...req.body,
+        image: req.body.image
+          ? req.body.image
+          : 'https://via.placeholder.com/150',
+      })
+        .then(item => {
+          res.status(201).json(item)
+        })
+        .catch(next)
+    }
+  }
+
   static create(req, res, next) {
     let travelResponse, itemResponse
     if (req.body.status === 'travel') {
