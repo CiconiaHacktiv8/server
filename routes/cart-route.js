@@ -5,6 +5,7 @@ const { authenticate } = require('../midllewares/auth')
 router.get('/open', authenticate, CartController.getCartWithStatusOpen)
 router.get('/offered', authenticate, CartController.getCartWithStatusOffered)
 router.get('/user', authenticate, CartController.getAllCartByUser)
+router.get('/travel', authenticate, CartController.getCartByTravel)
 
 router.get('/', CartController.getAllCarts)
 router.get('/:cartId', CartController.getCart)
