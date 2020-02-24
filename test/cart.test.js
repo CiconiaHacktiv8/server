@@ -60,8 +60,8 @@ describe('TESTING CART', function() {
           location: 'location item'
         })
       .then((data) =>{
-        console.log(data,'masukkk')
-          itemPreorder = data
+        console.log(data.body,'masukkk')
+          itemPreorder = data.body
       })
       .catch(err=>{console.log(err)})
 
