@@ -1,5 +1,8 @@
 //models
 const User = require('../models/user')
+const Item = require('../models/item')
+const Travel = require('../models/travel')
+const Cart = require('../models/cart')
 
 //token & commpare password
 const { comparePassword } = require('../helpers/bcrypt')
@@ -55,6 +58,85 @@ class UserCon {
         })
       })
       .catch(next)
+  }
+
+  static async getUserDetail(req, res, next) {
+    const result = {
+      items: [],
+      carts: [],
+      travel: null,
+    }
+    let carts
+
+    const items = await Item.find({ ownerId: req.payload.id })
+      .populate({
+        path: 'ownerId',
+        select: 'name email point',
+      })
+      .populate({
+        path: 'travelId',
+        populate: {
+          path: 'itemList',
+        },
+      })
+
+    result.items = items
+
+    const travel = await Travel.findOne({ userId: req.payload.id }).populate({
+      path: 'itemList',
+      populate: {
+        path: 'ownerId',
+        select: 'name email point',
+      },
+    })
+
+    result.travel = travel
+
+    if (!travel) {
+      carts = await Cart.find({ buyerId: req.payload.id })
+        .populate('buyerId', 'name email point')
+        .populate({
+          path: 'itemId',
+          populate: { path: 'ownerId', select: 'name email point' },
+        })
+        .populate({
+          path: 'travelId',
+          select: 'locationFrom locationTo departure userId',
+          populate: { path: 'userId', select: 'name email point' },
+        })
+
+      result.carts = carts
+    } else {
+      carts = await Cart.find({ travelId: travel.id, status: 'open' })
+        .populate('buyerId', 'name email point')
+        .populate({
+          path: 'itemId',
+          populate: { path: 'ownerId', select: 'name email point' },
+        })
+        .populate({
+          path: 'travelId',
+          select: 'locationFrom locationTo departure userId',
+          populate: { path: 'userId', select: 'name email point' },
+        })
+
+      result.carts = carts
+
+      carts = await Cart.find({ buyerId: req.payload.id })
+        .populate('buyerId', 'name email point')
+        .populate({
+          path: 'itemId',
+          populate: { path: 'ownerId', select: 'name email point' },
+        })
+        .populate({
+          path: 'travelId',
+          select: 'locationFrom locationTo departure userId',
+          populate: { path: 'userId', select: 'name email point' },
+        })
+
+      result.carts = [...result.carts, ...carts]
+    }
+
+    res.json(result)
   }
 }
 
