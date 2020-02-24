@@ -24,6 +24,10 @@ const cartSchema = new Schema({
   fixPrice: {
     type: Number,
   },
+  invoiceId: {
+    type: String,
+    default: null,
+  },
 })
 
 const cart = model('Cart', cartSchema)
