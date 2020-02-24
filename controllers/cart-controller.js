@@ -15,17 +15,21 @@ class CartController {
       .catch(next)
   }
 
-  static getCartWithStatusOpen(req, res, next) {
-    Travel.findOne({ userId: req.payload.id })
-      .then(travel => {
-        if (!travel) {
-          throw { name: 'NotFound', messages: ['Travel not found'] }
-        }
+  static async getCartWithStatusOpen(req, res, next) {
+    try {
+      const carts = await Cart.find({ buyerId: req.payload.id, status: 'open' })
+        .populate({
+          path: 'travelId',
+          populate: { path: 'itemList' },
+        })
+        .populate({
+          path: 'itemId',
+        })
 
-        return Cart.find({ travelId: travel.id, status: 'open' })
-      })
-      .then(carts => res.json(carts))
-      .catch(next)
+      res.json(carts)
+    } catch (err) {
+      next(err)
+    }
   }
 
   static getCartWithStatusOffered(req, res, next) {
