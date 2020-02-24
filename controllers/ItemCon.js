@@ -33,8 +33,12 @@ class ItemCon {
             travelResponse = travel
             Item.create({
               ...req.body,
+              image: req.body.image
+                ? req.body.image
+                : 'https://via.placeholder.com/150',
               travelId: travel.id,
               ownerId: req.payload.id,
+              location: travel.locationFrom,
             })
               .then(item => {
                 itemResponse = item
@@ -53,7 +57,12 @@ class ItemCon {
         .catch(next)
     } else {
       req.body.ownerId = req.payload.id
-      Item.create(req.body)
+      Item.create({
+        ...req.body,
+        image: req.body.image
+          ? req.body.image
+          : 'https://via.placeholder.com/150',
+      })
         .then(item => {
           res.status(201).json(item)
         })

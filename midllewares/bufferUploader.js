@@ -7,13 +7,13 @@ const bucketName = process.env.CLOUD_BUCKET
 const bucket = storage.bucket(bucketName)
 
 module.exports = (req, res, next) => {
-  if (!req.body.image) {
-    req.body.image.url = null
+  if (!req.body.base64) {
+    req.body.image = null
     next()
   }
 
-  const buff = Buffer.from(req.body.image.base64, 'base64') // make it to buffer
-  const file = bucket.file(req.body.image.filename)
+  const buff = Buffer.from(req.body.base64, 'base64') // make it to buffer
+  const file = bucket.file(req.body.imageName)
 
   file.save(
     buff,
@@ -29,7 +29,7 @@ module.exports = (req, res, next) => {
           messages: ['Error happened when upload image'],
         })
       } else {
-        req.body.image.url = `https://storage.googleapis.com/${bucketName}/${req.body.image.filename}`
+        req.body.image = `https://storage.googleapis.com/${bucketName}/${req.body.imageName}`
         next()
       }
     },
