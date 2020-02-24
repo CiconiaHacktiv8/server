@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/CiconiaHacktiv8/server#readme",
   "dependencies": {
+    "@google-cloud/storage": "^4.3.1",
     "bcryptjs": "^2.4.3",
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
