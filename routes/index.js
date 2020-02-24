@@ -20,7 +20,7 @@ route.use('/travels', travelRoute)
 route.use('/carts', cartRoute)
 route.use('/items', item)
 
-router.post('/test-route', function(req, res) {
+route.post('/test-route', function(req, res) {
   const buff = Buffer.from(req.body.image.base64, 'base64')
   const file = bucket.file(req.body.image.filename)
 
