@@ -24,18 +24,25 @@ class ItemCon {
   }
 
   static create(req, res, next) {
+    let travelResponse, itemResponse
     if (req.body.status === 'travel') {
       Travel.findOne({ userId: req.payload.id })
         .then(travel => {
           if (travel) {
             // di bikinin
+            travelResponse = travel
             Item.create({
               ...req.body,
               travelId: travel.id,
               ownerId: req.payload.id,
             })
               .then(item => {
-                res.status(201).json(item)
+                itemResponse = item
+                travelResponse.itemList.push(item.id)
+                return travelResponse.save({ validateBeforeSave: false })
+              })
+              .then(() => {
+                res.status(201).json(itemResponse)
               })
               .catch(next)
           } else {
