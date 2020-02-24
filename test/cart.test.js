@@ -5,8 +5,10 @@ const expect = chai.expect
 const app = require('../app')
 const Travel = require('../models/travel')
 const User = require('../models/user')
-const Cart = require('../')
+const Cart = require('../models/cart')
 const { generateToken } = require('../helpers/jwt')
+
+const base64File = require('./base64file')
 
 chai.use(chaiHttp)
 
@@ -55,12 +57,12 @@ describe('TESTING CART', function() {
           name: 'item preOrder',
           price: 99999,
           quantity: 1,
-          image: 'image url',
+          imageName: 'testing.jpg',
+          base64: base64File,
           status: 'travel', 
           location: 'location item'
         })
       .then((data) =>{
-        console.log(data.body,'masukkk')
           itemPreorder = data.body
       })
       .catch(err=>{console.log(err)})
@@ -77,17 +79,17 @@ describe('TESTING CART', function() {
     describe('as Watcher', function() {
 
       it('should return new cart - watcher buy itemPreOrder from travel list item - (code: 201)', async function() {
-
+        this.timeout(10000)
         const response = await chai
           .request(app)
           .post('/carts')
           .set('token', watchToken)
           .send({
-            // travelId = itemPreorder.ownerId,
-            // itemId= itemPreorder.id,
-            // quantity= 1,
-            // status= 'open',
-            // fixPrice=itemPreorder.price
+            travelId : itemPreorder.ownerId,
+            itemId: itemPreorder._id,
+            quantity: 1,
+            status: 'open',
+            fixPrice:itemPreorder.price
         })
 
         expect(response).to.have.status(201)
@@ -95,7 +97,6 @@ describe('TESTING CART', function() {
         expect(response.body).to.have.property('_id')
         expect(response.body).to.have.property('travelId')
         expect(response.body).to.have.property('buyerId')
-        expect(response.body).to.have.property('itemId')
         expect(response.body).to.have.property('quantity')
         expect(response.body).to.have.property('status')
         expect(response.body).to.have.property('fixPrice')
