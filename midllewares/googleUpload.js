@@ -1,7 +1,6 @@
 const gcsUpload = require('gcs-upload')
 
 const upload = function() {
-  console.log('msauk sini')
   return gcsUpload({
     limits: {
       fileSize: 1e6, // in bytes

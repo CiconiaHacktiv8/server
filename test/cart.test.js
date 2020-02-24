@@ -12,9 +12,9 @@ const base64File = require('./base64file')
 
 chai.use(chaiHttp)
 
-let travelUser, travelToken, watchUser, watchToken, itemPreorder
+let travelUser, travelToken, watchUser, watchToken, preOrderItem, requestItem
 
-describe('TESTING CART', function() {
+describe.only('TESTING CART', function() {
   before(async function() {
     //create user1
     travelUser = await User.create({
@@ -60,13 +60,32 @@ describe('TESTING CART', function() {
           imageName: 'testing.jpg',
           base64: base64File,
           status: 'travel', 
-          location: 'location item'
+          location: 'Hongkong'
         })
       .then((data) =>{
-          itemPreorder = data.body
+        this.timeout(10000)
+          preOrderItem = data.body
       })
       .catch(err=>{console.log(err)})
 
+    //create request item
+    await chai.request(app)
+      .post('/items')
+      .set('token', watchToken)
+      .send({
+          name: 'item request',
+          price: 10000,
+          quantity: 2,
+          imageName: 'testing.jpg',
+          base64: base64File,
+          status: 'watch', 
+          location: 'Singapore'
+        })
+      .then((data) =>{
+        this.timeout(10000)
+          requestItem = data.body
+      })
+      .catch(err=>{console.log(err)})
   })
 
   after(async function() {
@@ -77,7 +96,6 @@ describe('TESTING CART', function() {
 
   describe('1. Create Cart', function() {
     describe('as Watcher', function() {
-
       it('should return new cart - watcher buy itemPreOrder from travel list item - (code: 201)', async function() {
         this.timeout(10000)
         const response = await chai
@@ -85,11 +103,11 @@ describe('TESTING CART', function() {
           .post('/carts')
           .set('token', watchToken)
           .send({
-            travelId : itemPreorder.ownerId,
-            itemId: itemPreorder._id,
+            travelId : preOrderItem.ownerId,
+            itemId: preOrderItem._id,
             quantity: 1,
             status: 'open',
-            fixPrice:itemPreorder.price
+            fixPrice:preOrderItem.price
         })
 
         expect(response).to.have.status(201)
@@ -101,7 +119,51 @@ describe('TESTING CART', function() {
         expect(response.body).to.have.property('status')
         expect(response.body).to.have.property('fixPrice')
       })
+      it('should return error - accepted itemRequest but dont have travel - (code: 400)', async function() {
+        this.timeout(10000)
+        const response = await chai
+          .request(app)
+          .post('/carts')
+          .set('token', watchToken)
+          .send({
+            travelId : watchUser._id,
+            itemId: requestItem._id,
+            quantity: 1,
+            status: 'offered',
+            fixPrice: requestItem.price
+        })
+
+        expect(response).to.have.status(400)
+        expect(response.body).to.be.an('object')
+        expect(response.body).to.have.property('errors')
+        expect(response.body.errors[0]).to.equal('You didnt have travel')
+      })
     })
+    describe('as Travel', function() {
+      it('should return new cart - travel can buy itemRequest from watcher - (code: 201)', async function() {
+        this.timeout(10000)
+        const response = await chai
+          .request(app)
+          .post('/carts')
+          .set('token', travelToken)
+          .send({
+            travelId : travelUser._id,
+            itemId: requestItem._id,
+            quantity: 1,
+            status: 'offered',
+            fixPrice: requestItem.price
+        })
+
+        expect(response).to.have.status(201)
+        expect(response.body).to.be.an('object')
+        expect(response.body).to.have.property('_id')
+        expect(response.body).to.have.property('travelId')
+        expect(response.body).to.have.property('buyerId')
+        expect(response.body).to.have.property('quantity')
+        expect(response.body).to.have.property('status')
+        expect(response.body).to.have.property('fixPrice')
+      })
+    })    
   })
 
 })
