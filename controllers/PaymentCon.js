@@ -8,7 +8,7 @@ class PaymentCon{
     static  createInvoice(req,res,next) {
              i.createInvoice({
                 externalID: 'demo_1475801962607',
-                amount: 100000,
+                amount: req.body.amount,
                 payerEmail: req.payload.email,
                 description: req.body.description,
             })
