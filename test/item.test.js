@@ -6,13 +6,15 @@ const app = require('../app')
 const itemModel = require('../models/item')
 const userModel = require('../models/user')
 
+const base64File = require('./base64file')
+
 chai.use(chaiHttp)
 
 let itemWatcher = ''
 let user = ''
 let itemTravel = ''
 let newUser = ''
-describe.only('/testing item', function() {
+describe('TESTING ITEM', function() {
     before( async function (){
         await  itemModel.deleteMany({name : 'item name'},function(err,data){
             if (err) {
@@ -59,12 +61,13 @@ describe.only('/testing item', function() {
                 departure: '2020-02-21',
               })
             .then((data) =>{
-                console.log('creates travel')
+                console.log('created travel')
             })
             .catch(err=>{console.log(err)})                 
     })     
   describe('Post item', function() {
       it('should return created item and status code 201', function(done) {
+        this.timeout(10000)
         chai.request(app)
             .post('/items')
             .set('token',user.body.token)
@@ -72,7 +75,8 @@ describe.only('/testing item', function() {
                 name: 'item name',
                 price: 99999,
                 quantity: 1,
-                image: 'image url',
+                imageName: 'testing.jpg',
+                base64: base64File,
                 status: 'travel', // input with travel or watch
                 location: 'location item'
             })
@@ -98,7 +102,8 @@ describe.only('/testing item', function() {
                     .send({
                         price: 99999,
                         quantity: 1,
-                        image: 'image url',
+                        imageName: 'testing.jpg',
+                        base64: base64File,
                         status: 'travel', // input with travel or watch
                         location: 'location item'
                     })
@@ -120,7 +125,8 @@ describe.only('/testing item', function() {
                         name: 'item name',
                         price: 500,
                         quantity: 1,
-                        image: 'image url',
+                                        imageName: 'testing.jpg',
+                base64: base64File,
                         status: 'travel', // input with travel or watch
                         location: 'location item'
                     })
@@ -140,7 +146,8 @@ describe.only('/testing item', function() {
                         name: 'item name',
                         price: '',
                         quantity: 1,
-                        image: 'image url',
+                                        imageName: 'testing.jpg',
+                base64: base64File,
                         status: 'travel', // input with travel or watch
                         location: 'location item'
                     })
@@ -162,7 +169,8 @@ describe.only('/testing item', function() {
                         name: 'item name',
                         price: 99999,
                         quantity: 0,
-                        image: 'image url',
+                                        imageName: 'testing.jpg',
+                base64: base64File,
                         status: 'travel', // input with travel or watch
                         location: 'location item'
                     })
@@ -181,7 +189,8 @@ describe.only('/testing item', function() {
                     .send({
                         name: 'item name',
                         price: 99999,
-                        image: 'image url',
+                                        imageName: 'testing.jpg',
+                base64: base64File,
                         status: 'travel', // input with travel or watch
                         location: 'location item'
                     })
@@ -208,14 +217,21 @@ describe.only('/testing item', function() {
                         name: 'item name',
                         price: 99999,
                         quantity: 1,
-                        image: '',
+                        imageName: 'testing.jpg',
+                        base64: '',
                         status: 'travel', // input with travel or watch
                         location: 'location item'
                     })
                     .then(function(res){
-                        expect(res).to.have.status(400)
-                        expect(res.body).to.have.property('errors')
-                        expect(res.body.errors[0]).to.equal('you must enter item image')
+                        expect(res).to.have.status(201)
+                        expect(res.body).to.have.property('name').equal(res.body.name)
+                        expect(res.body).to.have.property('price').equal(res.body.price)
+                        expect(res.body).to.have.property('quantity').equal(res.body.quantity)
+                        expect(res.body).to.have.property('image').equal('https://via.placeholder.com/150')
+                        expect(res.body).to.have.property('ownerId').equal(res.body.ownerId)
+                        expect(res.body).to.have.property('status').equal(res.body.status)
+                        expect(res.body).to.have.property('location').equal(res.body.location)
+                        itemTravel = res
                         done()
                     })
                     .catch(done)
@@ -230,7 +246,8 @@ describe.only('/testing item', function() {
                         name: 'item name',
                         price: 99999,
                         quantity: 1,
-                        image: 'image url',
+                                        imageName: 'testing.jpg',
+                base64: base64File,
                         status: 'travel', // input with travel or watch
                         location: 'location item'
                     })
@@ -252,7 +269,8 @@ describe.only('/testing item', function() {
                         name: 'item name',
                         price: 99999,
                         quantity: 1,
-                        image: 'image url',
+                                        imageName: 'testing.jpg',
+                base64: base64File,
                         status: '', // input with travel or watch
                         location: 'location item'
                     })
@@ -272,7 +290,8 @@ describe.only('/testing item', function() {
                         name: 'item name',
                         price: 99999,
                         quantity: 1,
-                        image: 'image url',
+                        imageName: 'testing.jpg',
+                        base64: base64File,
                         status: 'itemStatus', // input with travel or watch
                         location: 'location item'
                     })
@@ -294,9 +313,8 @@ describe.only('/testing item', function() {
                         name: 'item name',
                         price: 99999,
                         quantity: 1,
-                        image: 'image url',
-                        status: 'travel', // input with travel or watch
-                        location: ''
+                        imageName: 'testing.jpg',
+                        base64: base64File,
                     })
                     .then(function(res){
                         expect(res).to.have.status(400)
@@ -316,13 +334,6 @@ describe.only('/testing item', function() {
                 .then(function(res){
                     expect(res).to.have.status(200)
                     expect(res.body).to.be.an('array')
-                    // expect(res.body[(res.body.length) -1]).have.property('name').to.be.a('string')
-                    // expect(res.body[(res.body.length) -1]).have.property('price').to.be.a('number')
-                    // expect(res.body[(res.body.length) -1]).have.property('quantity').to.be.a('number')
-                    // expect(res.body[(res.body.length) -1]).have.property('image').to.be.a('string')
-                    // expect(res.body[(res.body.length) -1]).have.property('ownerId').to.be.a('string')
-                    // expect(res.body[(res.body.length) -1]).have.property('status').to.be.a('string')
-                    // expect(res.body[(res.body.length) -1]).have.property('location').to.be.a('string')
                     done()                    
                 })
                 .catch(done)
@@ -337,7 +348,8 @@ describe.only('/testing item', function() {
                   name: 'item name',
                   price: 99999,
                   quantity: 1,
-                  image: 'image url',
+                                  imageName: 'testing.jpg',
+                base64: base64File,
                   status: 'watch', // input with travel or watch
                   location: 'location item'
               })

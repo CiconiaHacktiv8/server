@@ -5,163 +5,103 @@ const expect = chai.expect
 const app = require('../app')
 const Travel = require('../models/travel')
 const User = require('../models/user')
+const Cart = require('../models/cart')
 const { generateToken } = require('../helpers/jwt')
+
+const base64File = require('./base64file')
 
 chai.use(chaiHttp)
 
-let user, token
+let travelUser, travelToken, watchUser, watchToken, itemPreorder
 
 describe('TESTING CART', function() {
   before(async function() {
-    user = await User.create({
-      name: 'testing',
-      email: 'testing@email.com',
+    //create user1
+    travelUser = await User.create({
+      name: 'user',
+      email: 'user@email.com',
       password: 'testing',
     })
 
-    token = generateToken({ id: user.id })
+    travelToken = generateToken({ id: travelUser.id })
+
+    //create user2
+    watchUser = await User.create({
+      name: 'user2',
+      email: 'user2@email.com',
+      password: 'testing',
+    })
+
+    watchToken = generateToken({ id: watchUser.id })
+
+
+    //create travel with id user1   
+    await chai.request(app)
+      .post('/travels')
+      .set('token', travelToken)
+      .send({
+          locationFrom: 'Singapore',
+          locationTo: 'Indonesia',
+          departure: '2020-02-21',
+        })
+      .then((data) =>{
+          console.log('created travel')
+      })
+      .catch(err=>{console.log(err)})
+    
+    //create preOrder from user who have travel
+    await chai.request(app)
+      .post('/items')
+      .set('token', travelToken)
+      .send({
+          name: 'item preOrder',
+          price: 99999,
+          quantity: 1,
+          imageName: 'testing.jpg',
+          base64: base64File,
+          status: 'travel', 
+          location: 'location item'
+        })
+      .then((data) =>{
+          itemPreorder = data.body
+      })
+      .catch(err=>{console.log(err)})
+
   })
 
   after(async function() {
     await User.deleteMany({})
+    await Travel.deleteMany({})
+    await Cart.deleteMany({})
   })
 
-  describe('1. Create Travel', function() {
-    describe('Start create travel', function() {
-      afterEach(async function() {
-        await Travel.deleteMany({})
-      })
+  describe('1. Create Cart', function() {
+    describe('as Watcher', function() {
 
-      it('should return new travel document - (code: 201)', async function() {
-        const data = {
-          locationFrom: 'Singapore',
-          locationTo: 'Indonesia',
-          departure: '2020-02-21',
-        }
-
+      it('should return new cart - watcher buy itemPreOrder from travel list item - (code: 201)', async function() {
+        this.timeout(10000)
         const response = await chai
           .request(app)
-          .post('/travels')
-          .set('token', token)
-          .send(data)
+          .post('/carts')
+          .set('token', watchToken)
+          .send({
+            travelId : itemPreorder.ownerId,
+            itemId: itemPreorder._id,
+            quantity: 1,
+            status: 'open',
+            fixPrice:itemPreorder.price
+        })
 
         expect(response).to.have.status(201)
         expect(response.body).to.be.an('object')
         expect(response.body).to.have.property('_id')
-        expect(response.body).to.have.property('locationFrom')
-        expect(response.body).to.have.property('locationTo')
-        expect(response.body.locationFrom).to.be.equal('Singapore')
-        expect(response.body.locationTo).to.be.equal('Indonesia')
-      })
-
-      it('should return error - (missing body, code: 400)', async function() {
-        const response = await chai
-          .request(app)
-          .post('/travels')
-          .set('token', token)
-          .send({})
-
-        expect(response).to.have.status(400)
-        expect(response.body).to.be.an('object')
-        expect(response.body).to.have.property('errors')
-        expect(response.body.errors).to.be.an('array')
-        expect(response.body.errors).to.include('locationFrom is missing')
-        expect(response.body.errors).to.include('locationTo is missing')
-        expect(response.body.errors).to.include('departure is missing')
-      })
-
-      it('should return error - (already have active travel, code: 400)', async function() {
-        const data = {
-          locationFrom: 'Singapore',
-          locationTo: 'Indonesia',
-          departure: '2020-02-21',
-        }
-
-        await chai
-          .request(app)
-          .post('/travels')
-          .set('token', token)
-          .send(data)
-
-        const response = await chai
-          .request(app)
-          .post('/travels')
-          .set('token', token)
-          .send(data)
-
-        expect(response).to.have.status(400)
-        expect(response.body).to.be.an('object')
-        expect(response.body).to.have.property('errors')
-        expect(response.body.errors).to.be.an('array')
-        expect(response.body.errors).to.include('Cant make another travel')
+        expect(response.body).to.have.property('travelId')
+        expect(response.body).to.have.property('buyerId')
+        expect(response.body).to.have.property('quantity')
+        expect(response.body).to.have.property('status')
+        expect(response.body).to.have.property('fixPrice')
       })
     })
   })
 
-  describe('2. Update Travel', function() {
-    let travel
-    before(async function() {
-      travel = await Travel.create({
-        userId: user.id,
-        locationFrom: 'Singapore',
-        locationTo: 'Indonesia',
-        departure: '2020-02-21',
-      })
-    })
-
-    after(async function() {
-      await Travel.deleteMany({})
-    })
-
-    describe('Start update travel', function() {
-      it('should return travel object - (code: 200)', async function() {
-        const response = await chai
-          .request(app)
-          .patch(`/travels/${travel.id}`)
-          .set('token', token)
-          .send({ locationFrom: 'Jawa Tengah' })
-
-        expect(response).to.have.status(200)
-        expect(response.body).to.be.an('object')
-        expect(response.body).to.have.property('_id')
-        expect(response.body).to.have.property('locationFrom')
-        expect(response.body).to.have.property('locationTo')
-        expect(response.body.locationFrom).to.be.equal('Jawa Tengah')
-        expect(response.body.locationTo).to.be.equal('Indonesia')
-      })
-    })
-  })
-
-  describe('3. Delete Travel', function() {
-    let travel
-    before(async function() {
-      travel = await Travel.create({
-        userId: user.id,
-        locationFrom: 'Singapore',
-        locationTo: 'Indonesia',
-        departure: '2020-02-21',
-      })
-    })
-
-    after(async function() {
-      await Travel.deleteMany({})
-    })
-
-    describe('Start delete travel', function() {
-      it('should return travel object - code(200)', async function() {
-        const response = await chai
-          .request(app)
-          .delete(`/travels/${travel.id}`)
-          .set('token', token)
-
-        expect(response).to.have.status(200)
-        expect(response.body).to.be.an('object')
-        expect(response.body).to.have.property('_id')
-        expect(response.body).to.have.property('locationFrom')
-        expect(response.body).to.have.property('locationTo')
-        expect(response.body.locationFrom).to.be.equal('Singapore')
-        expect(response.body.locationTo).to.be.equal('Indonesia')
-      })
-    })
-  })
 })
