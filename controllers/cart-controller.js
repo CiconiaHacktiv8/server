@@ -34,6 +34,25 @@ class CartController {
       .catch(next)
   }
 
+  static async getCartByTravel(req, res, next) {
+    const travel = await Travel.findOne({ userId: req.payload.id })
+    if (!travel) {
+      res.json([])
+    } else {
+      const carts = await Cart.find({
+        travelId: travel.id,
+        status: 'pending delivery',
+      })
+        .populate('buyerId', 'name email point')
+        .populate({
+          path: 'itemId',
+          select: 'name price image status',
+        })
+
+      res.json(carts)
+    }
+  }
+
   static async getAllCartByUser(req, res, next) {
     const result = {
       open: [],
