@@ -3,6 +3,7 @@ const route = express.Router()
 const travelRoute = require('./travel-route')
 const item = require('./item')
 const cartRoute = require('./cart-route')
+const { authenticate } = require('../midllewares/auth')
 
 const UserController = require('../controllers/UserCon')
 
@@ -19,6 +20,7 @@ route.post('/register', UserController.register)
 route.use('/travels', travelRoute)
 route.use('/carts', cartRoute)
 route.use('/items', item)
+route.get('/users', authenticate, UserController.getUserDetail)
 
 route.post('/test-route', function(req, res) {
   const buff = Buffer.from(req.body.image.base64, 'base64')
