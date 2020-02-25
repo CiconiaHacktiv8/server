@@ -16,13 +16,13 @@ module.exports = (err, req, res, next) => {
       break
 
     case 'JsonWebTokenError':
-      res.status(400).send({
+      res.status(400).json({
         errors: ['invalid token'],
       })
       break
 
     case 'CastError':
-      res.status(404).send({
+      res.status(404).json({
         errors: 'not found',
       })
       break

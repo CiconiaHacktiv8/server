@@ -13,37 +13,41 @@ class TravelController {
   static async addNewTravel(req, res, next) {
     let itemListIds = []
 
-    const travel = await Travel.create({
-      userId: req.payload.id,
-      locationFrom: req.body.locationFrom,
-      locationTo: req.body.locationTo,
-      departure: req.body.departure,
-    })
+    try {
+      const travel = await Travel.create({
+        userId: req.payload.id,
+        locationFrom: req.body.locationFrom,
+        locationTo: req.body.locationTo,
+        departure: req.body.departure,
+      })
 
-    if (req.body.itemList && req.body.itemList.length > 0) {
-      // masuk masukin item ke travel
-      for (let i = 0; i < req.body.itemList.length; ++i) {
-        let itemId = await addItemManually(
-          req.body.itemList[i],
-          req.payload.id,
-          travel.id,
-          travel.location,
-        )
-        itemListIds.push(itemId)
+      if (req.body.itemList && req.body.itemList.length > 0) {
+        // masuk masukin item ke travel
+        for (let i = 0; i < req.body.itemList.length; ++i) {
+          let itemId = await addItemManually(
+            req.body.itemList[i],
+            req.payload.id,
+            travel.id,
+            travel.location,
+          )
+          itemListIds.push(itemId)
+        }
+
+        itemListIds = itemListIds.filter(id => id !== null)
+
+        travel.itemList = itemListIds
+        travel = await travel.save({ validateBeforeSave: false })
       }
 
-      itemListIds = itemListIds.filter(id => id !== null)
+      const newTravel = await Travel.findOne({ _id: travel.id }).populate(
+        'userId',
+        'name email point',
+      )
 
-      travel.itemList = itemListIds
-      travel = await travel.save({ validateBeforeSave: false })
+      res.json(newTravel)
+    } catch (err) {
+      next(err)
     }
-
-    const newTravel = Travel.findOne({ _id: travel.id }).populate(
-      'userId',
-      'name email point',
-    )
-
-    res.json(newTravel)
   }
 
   static getTravel(req, res, next) {
