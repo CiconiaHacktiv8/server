@@ -45,7 +45,7 @@ class CartController {
     } else {
       const carts = await Cart.find({
         travelId: travel.id,
-        status: 'pending delivery',
+        status: 'pending verification',
       })
         .populate('buyerId', 'name email point')
         .populate({
