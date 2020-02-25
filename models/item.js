@@ -9,7 +9,7 @@ const ItemSchema = new Schema({
   price: {
     type: Number,
     required: [true, 'you must enter item price'],
-    min: [1000, 'minimal price is 1000'],
+    min: [10000, 'minimal price is 10000'],
   },
   quantity: {
     type: Number,
