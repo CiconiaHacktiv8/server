@@ -32,7 +32,7 @@ class TravelController {
         itemListIds.push(itemId)
       }
 
-      itemListIds = itemListIds.filter(id => !id)
+      itemListIds = itemListIds.filter(id => id !== null)
 
       travel.itemList = itemListIds
       travel = await travel.save({ validateBeforeSave: false })
