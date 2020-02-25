@@ -3,7 +3,7 @@ const { Invoice } = new Xendit({ secretKey: process.env.SECRET_KEY_XENDIT })
 const invoiceSpecificOptions = {};
 const i = new Invoice(invoiceSpecificOptions)
 
-
+/* istanbul ignore next */
 class PaymentCon{
     static async  createInvoice(req,res,next) {
           const temp =  await i.createInvoice({
