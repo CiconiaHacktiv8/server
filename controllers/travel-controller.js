@@ -21,7 +21,7 @@ class TravelController {
     let itemListIds = []
 
     try {
-      const travel = await Travel.create({
+      let travel = await Travel.create({
         userId: req.payload.id,
         locationFrom: req.body.locationFrom,
         locationTo: req.body.locationTo,
@@ -35,22 +35,23 @@ class TravelController {
             req.body.itemList[i],
             req.payload.id,
             travel.id,
-            travel.location,
-          )
+            travel.locationFrom,
+            )
+
           itemListIds.push(itemId)
         }
 
         itemListIds = itemListIds.filter(id => id !== null)
-
         travel.itemList = itemListIds
+
         travel = await travel.save({ validateBeforeSave: false })
+        
       }
 
       const newTravel = await Travel.findOne({ _id: travel.id }).populate(
         'userId',
         'name email point',
       )
-
       res.status(201).json(newTravel)
     } catch (err) {
       next(err)

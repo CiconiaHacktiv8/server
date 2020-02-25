@@ -16,14 +16,13 @@ module.exports = async function(itemData, ownerId, travelId, travelLocation) {
 
   buff = Buffer.from(itemData.base64, 'base64')
   file = bucket.file(itemData.imageName)
-
   try {
     await file.save(buff, {
       metadata: {
         contentType: 'image/jpeg',
       },
     })
-
+    
     image = `https://storage.googleapis.com/${bucketName}/${itemData.imageName}`
   } catch (err) {
     image = 'https://via.placeholder.com/150'
@@ -40,7 +39,6 @@ module.exports = async function(itemData, ownerId, travelId, travelLocation) {
       status: 'travel',
       location: travelLocation,
     })
-
     itemId = item.id
   } catch (err) {
     itemId = null
