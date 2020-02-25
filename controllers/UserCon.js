@@ -65,6 +65,7 @@ class UserCon {
       items: [],
       carts: [],
       travel: null,
+      user: null,
     }
     let carts
 
@@ -82,13 +83,18 @@ class UserCon {
 
     result.items = items
 
-    const travel = await Travel.findOne({ userId: req.payload.id }).populate({
-      path: 'itemList',
-      populate: {
-        path: 'ownerId',
+    const travel = await Travel.findOne({ userId: req.payload.id })
+      .populate({
+        path: 'itemList',
+        populate: {
+          path: 'ownerId',
+          select: 'name email point',
+        },
+      })
+      .populate({
+        path: 'userId',
         select: 'name email point',
-      },
-    })
+      })
 
     result.travel = travel
 
@@ -135,6 +141,8 @@ class UserCon {
 
       result.carts = [...result.carts, ...carts]
     }
+
+    result.user = User.findOne({ _id: req.payload.id }, 'name email point')
 
     res.json(result)
   }
