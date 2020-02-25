@@ -19,7 +19,14 @@ const cartSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ['open', 'offered', 'pending purchase', 'pending delivery'],
+    enum: [
+      'open',
+      'offered',
+      'pending purchase',
+      'pending verification',
+      'pending delivery',
+      'completed',
+    ],
   },
   fixPrice: {
     type: Number,

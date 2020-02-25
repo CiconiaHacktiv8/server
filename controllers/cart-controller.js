@@ -128,13 +128,16 @@ class CartController {
         result.pendingDelivery = cart.filter(
           c => c.status === 'pending delivery',
         )
+        result.pendingDelivery = [
+          ...pendingDelivery,
+          ...cart.filter(c => c.status === 'pending verification'),
+        ]
 
         res.json(result)
       }
     } catch (err) {
       next(err)
     }
-
   }
 
   static async addNewCart(req, res, next) {
