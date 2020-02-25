@@ -51,7 +51,7 @@ class TravelController {
         'name email point',
       )
 
-      res.json(newTravel)
+      res.status(201).json(newTravel)
     } catch (err) {
       next(err)
     }
