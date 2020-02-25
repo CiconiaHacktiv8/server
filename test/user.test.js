@@ -7,6 +7,8 @@ const User = require('../models/user')
 
 chai.use(chaiHttp)
 
+let user
+
 describe('TESTING USER', function() {
   after(async function() {
     await User.deleteMany({})
@@ -124,7 +126,20 @@ describe('TESTING USER', function() {
         const response = await chai
           .request(app)
           .post('/login')
-          .send({ email: 'wrong@email.com', password: 'wrong password' })
+          .send({ email: 'testing@email.com', password: 'wrong password' })
+
+        expect(response).to.have.status(400)
+        expect(response.body).to.be.an('object')
+        expect(response.body).to.have.property('errors')
+        expect(response.body.errors).to.be.an('array')
+        expect(response.body.errors).to.include('Email or password is wrong')
+      })
+
+      it('Should return error - (incorrect email and or passsword, code: 400)', async function() {
+        const response = await chai
+          .request(app)
+          .post('/login')
+          .send({ email: 'wrongemail@mail.com', password: 'testing' })
 
         expect(response).to.have.status(400)
         expect(response.body).to.be.an('object')
@@ -134,4 +149,53 @@ describe('TESTING USER', function() {
       })
     })
   })
+  describe('3. User profile', function() {
+    before(async function() {
+    let respone = await chai
+        .request(app)
+        .post('/register')
+        .send({
+          name: 'testing',
+          email: 'testing2@email.com',
+          password: 'testing',
+        })
+        user = respone.body
+
+    await chai.request(app)
+      .post('/travels')
+      .set('token', user.token)
+      .send({
+          locationFrom: 'Singapore',
+          locationTo: 'Indonesia',
+          departure: '2020-02-21',
+        })
+      .then((data) =>{
+        this.timeout(10000)
+      })
+      .catch(err=>{console.log(err)})
+    })
+
+    after(async function() {
+      User.deleteMany({})
+    })
+
+    describe('get user detail', function() {
+      it('Should return token with status code 200', async function() {
+        const response = await chai
+          .request(app)
+          .get('/users')
+          .set('token', user.token)
+
+        expect(response).to.have.status(200)
+        expect(response.body).to.be.an('object')
+        expect(response.body).to.have.property('items')
+        expect(response.body.items).to.be.a('array')
+        expect(response.body).to.have.property('carts')
+        expect(response.body.carts).to.be.a('array')
+        expect(response.body).to.have.property('travel')
+        expect(response.body).to.have.property('user')
+      })
+
+    })
+  })  
 })
