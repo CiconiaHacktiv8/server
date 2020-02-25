@@ -91,6 +91,10 @@ class CartController {
         result.pendingDelivery = cart.filter(
           c => c.status === 'pending delivery',
         )
+        result.pendingDelivery = [
+          ...result.pendingDelivery,
+          ...cart.filter(c => c.status === 'pending verification'),
+        ]
 
         res.json(result)
       } else {
