@@ -135,51 +135,6 @@ class CartController {
       next(err)
     }
 
-    // Travel.findOne({ userId: req.payload.id })
-    // .then(travel => {
-    // if (!travel) {
-    // throw { name: 'NotFound', messages: ['Travel not found'] }
-    // }
-
-    // return Cart.find({ travelId: travel.id, status: 'open' })
-    // .populate('buyerId', 'name email point')
-    // .populate({
-    // path: 'itemId',
-    // populate: { path: 'ownerId', select: 'name email point' },
-    // })
-    // .populate({
-    // path: 'travelId',
-    // select: 'locationFrom locationTo departure userId',
-    // populate: { path: 'userId', select: 'name email point' },
-    // })
-    // })
-    // .then(carts => {
-    // result.open = carts
-
-    // return Cart.find({ buyerId: req.payload.id })
-    // .populate('buyerId', 'name email point')
-    // .populate({
-    // path: 'itemId',
-    // populate: { path: 'ownerId', select: 'name email point' },
-    // })
-    // .populate({
-    // path: 'travelId',
-    // select: 'locationFrom locationTo departure userId',
-    // populate: { path: 'userId', select: 'name email point' },
-    // })
-    // })
-    // .then(carts => {
-    // result.offered = carts.filter(cart => cart.status === 'offered')
-    // result.pendingPurchase = carts.filter(
-    // cart => cart.status === 'pending purchase',
-    // )
-    // result.pendingDelivery = carts.filter(
-    // cart => cart.status === 'pending delivery',
-    // )
-
-    // res.json(result)
-    // })
-    // .catch(next)
   }
 
   static async addNewCart(req, res, next) {
