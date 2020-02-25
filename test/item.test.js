@@ -269,8 +269,8 @@ describe('TESTING ITEM', function() {
                         name: 'item name',
                         price: 99999,
                         quantity: 1,
-                                        imageName: 'testing.jpg',
-                base64: base64File,
+                        imageName: 'testing.jpg',
+                        base64: base64File,
                         status: '', // input with travel or watch
                         location: 'location item'
                     })
