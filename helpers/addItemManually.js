@@ -8,6 +8,7 @@ const Item = require('../models/item')
 const bucketName = process.env.CLOUD_BUCKET
 const bucket = storage.bucket(bucketName)
 
+/* istanbul ignore next */
 module.exports = async function(itemData, ownerId, travelId, travelLocation) {
   let image, buff, file, item, itemId
 

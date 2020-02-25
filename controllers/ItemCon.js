@@ -22,7 +22,7 @@ class ItemCon {
       })
       .catch(next)
   }
-
+/* istanbul ignore next */
   static createFromWeb(req, res, next) {
     let travelResponse, itemResponse
     if (req.body.status === 'travel') {

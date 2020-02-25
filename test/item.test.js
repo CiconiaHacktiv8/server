@@ -117,13 +117,13 @@ describe('TESTING ITEM', function() {
             })
         })      
         describe('Test validation price',function(){
-            it('should return status 400 when object price less then 1000', function(done){
+            it('should return status 400 when object price less then 10000', function(done){
                 chai.request(app)
                     .post('/items')
                     .set('token',user.body.token)
                     .send({
                         name: 'item name',
-                        price: 500,
+                        price: 5000,
                         quantity: 1,
                                         imageName: 'testing.jpg',
                 base64: base64File,
@@ -133,7 +133,7 @@ describe('TESTING ITEM', function() {
                     .then(function(res){
                         expect(res).to.have.status(400)
                         expect(res.body).to.have.property('errors')
-                        expect(res.body.errors[0]).to.equal('minimal price is 1000')
+                        expect(res.body.errors[0]).to.equal('minimal price is 10000')
                         done()
                     })
                     .catch(done)
@@ -269,8 +269,8 @@ describe('TESTING ITEM', function() {
                         name: 'item name',
                         price: 99999,
                         quantity: 1,
-                                        imageName: 'testing.jpg',
-                base64: base64File,
+                        imageName: 'testing.jpg',
+                        base64: base64File,
                         status: '', // input with travel or watch
                         location: 'location item'
                     })

@@ -129,7 +129,7 @@ class CartController {
           c => c.status === 'pending delivery',
         )
         result.pendingDelivery = [
-          ...pendingDelivery,
+          ...result.pendingDelivery,
           ...cart.filter(c => c.status === 'pending verification'),
         ]
 
