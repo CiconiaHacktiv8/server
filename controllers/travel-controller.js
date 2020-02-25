@@ -1,4 +1,6 @@
 const Travel = require('../models/travel')
+const Item = require('../models/item')
+const addItemManually = require('../helpers/addItemManually')
 
 class TravelController {
   static getAllTravels(req, res, next) {
@@ -8,15 +10,40 @@ class TravelController {
       .catch(next)
   }
 
-  static addNewTravel(req, res, next) {
-    Travel.create({
+  static async addNewTravel(req, res, next) {
+    let itemListIds = []
+
+    const travel = await Travel.create({
       userId: req.payload.id,
       locationFrom: req.body.locationFrom,
       locationTo: req.body.locationTo,
       departure: req.body.departure,
     })
-      .then(travel => res.status(201).json(travel))
-      .catch(next)
+
+    if (req.body.itemList && req.body.itemList.length > 0) {
+      // masuk masukin item ke travel
+      for (let i = 0; i < req.body.itemList.length; ++i) {
+        let itemId = await addItemManually(
+          req.body.itemList[i],
+          req.payload.id,
+          travel.id,
+          travel.location,
+        )
+        itemListIds.push(itemId)
+      }
+
+      itemListIds = itemListIds.filter(id => !id)
+
+      travel.itemList = itemListIds
+      travel = await travel.save({ validateBeforeSave: false })
+    }
+
+    const newTravel = Travel.findOne({ _id: travel.id }).populate(
+      'userId',
+      'name email point',
+    )
+
+    res.json(newTravel)
   }
 
   static getTravel(req, res, next) {

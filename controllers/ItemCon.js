@@ -24,7 +24,6 @@ class ItemCon {
   }
 
   static createFromWeb(req, res, next) {
-    console.log('masuk ke sini')
     let travelResponse, itemResponse
     if (req.body.status === 'travel') {
       Travel.findOne({ userId: req.payload.id })
