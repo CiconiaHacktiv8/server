@@ -17,12 +17,13 @@ class ItemCon {
       _id: req.params.id,
     })
       .populate('ownerId', 'email name point')
+      .populate('travelId')
       .then(item => {
         res.status(200).json(item)
       })
       .catch(next)
   }
-/* istanbul ignore next */
+  /* istanbul ignore next */
   static createFromWeb(req, res, next) {
     let travelResponse, itemResponse
     if (req.body.status === 'travel') {
