@@ -50,7 +50,11 @@ class CartController {
         .populate('buyerId', 'name email point')
         .populate({
           path: 'itemId',
-          select: 'name price image status',
+          select: 'name price image status location',
+          populate: {
+            path: 'ownerId',
+            select: 'name email point',
+          },
         })
 
       res.json(carts)
