@@ -47,6 +47,7 @@ class ItemCon {
                 return travelResponse.save({ validateBeforeSave: false })
               })
               .then(() => {
+                req.io.emit('refetch-data') // emit event on socket
                 res.status(201).json(itemResponse)
               })
               .catch(next)
@@ -65,6 +66,7 @@ class ItemCon {
           : 'https://via.placeholder.com/150',
       })
         .then(item => {
+          req.io.emit('refetch-data') // emit event on socket
           res.status(201).json(item)
         })
         .catch(next)
@@ -94,6 +96,7 @@ class ItemCon {
                 return travelResponse.save({ validateBeforeSave: false })
               })
               .then(() => {
+                req.io.emit('refetch-data') // emit event on socket
                 res.status(201).json(itemResponse)
               })
               .catch(next)
@@ -112,6 +115,7 @@ class ItemCon {
           : 'https://via.placeholder.com/150',
       })
         .then(item => {
+          req.io.emit('refetch-data') // emit event on socket
           res.status(201).json(item)
         })
         .catch(next)
@@ -122,6 +126,7 @@ class ItemCon {
     //cek cart dulu jangan lupa !!
     Item.findByIdAndDelete(req.params.id)
       .then(response => {
+        req.io.emit('refetch-data') // emit event on socket
         res.status(200).json(response)
       })
       .catch(next)
@@ -137,6 +142,7 @@ class ItemCon {
         }
       })
       .then(respone => {
+        req.io.emit('refetch-data') // emit event on socket
         res.status(200).json(respone)
       })
       .catch(next)
@@ -152,6 +158,7 @@ class ItemCon {
         }
       })
       .then(respone => {
+        req.io.emit('refetch-data') // emit event on socket
         res.status(200).json(respone)
       })
       .catch(next)

@@ -36,7 +36,7 @@ class TravelController {
             req.payload.id,
             travel.id,
             travel.locationFrom,
-            )
+          )
 
           itemListIds.push(itemId)
         }
@@ -45,13 +45,13 @@ class TravelController {
         travel.itemList = itemListIds
 
         travel = await travel.save({ validateBeforeSave: false })
-        
       }
 
       const newTravel = await Travel.findOne({ _id: travel.id }).populate(
         'userId',
         'name email point',
       )
+      req.io.emit('refetch-data') // emit event on socket
       res.status(201).json(newTravel)
     } catch (err) {
       next(err)
@@ -73,13 +73,19 @@ class TravelController {
     Travel.findOneAndUpdate({ _id: req.params.travelId }, req.body, {
       new: true,
     })
-      .then(travel => res.json(travel))
+      .then(travel => {
+        req.io.emit('refetch-data') // emit event on socket
+        res.json(travel)
+      })
       .catch(next)
   }
 
   static deleteTravel(req, res, next) {
     Travel.findByIdAndRemove(req.params.travelId)
-      .then(travel => res.json(travel))
+      .then(travel => {
+        req.io.emit('refetch-data') // emit event on socket
+        res.json(travel)
+      })
       .catch(next)
   }
 }

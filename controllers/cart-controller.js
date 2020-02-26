@@ -190,6 +190,7 @@ class CartController {
         fixPrice: req.body.fixPrice,
       })
 
+      req.io.emit('refetch-data') // emit event to socket
       res.status(201).json(cart)
     } else {
       const cart = await Cart.create({
@@ -201,6 +202,7 @@ class CartController {
         fixPrice: req.body.fixPrice,
       })
 
+      req.io.emit('refetch-data') // emit event to socket
       res.status(201).json(cart)
     }
   }
@@ -226,6 +228,8 @@ class CartController {
           req.body,
           { new: true },
         )
+
+        req.io.emit('refetch-data') // emit event to socket
         res.json(updatedCart)
       } else {
         if (req.body.status === 'pending purchase') {
@@ -247,24 +251,26 @@ class CartController {
           travel.itemList.push(item.id)
           await travel.save({ validateBeforeSave: false })
 
+          req.io.emit('refetch-data') // emit event to socket
           res.json(cart)
         } else {
           cart = await Cart.findByIdAndRemove(req.params.cartId)
+
+          req.io.emit('refetch-data') // emit event to socket
           res.json(cart)
         }
       }
     } catch (err) {
       next(err)
     }
-
-    // Cart.findOneAndUpdate({ _id: req.params.cartId }, req.body, { new: true })
-    // .then(cart => res.json(cart))
-    // .catch(next)
   }
 
   static deleteCart(req, res, next) {
     Cart.findByIdAndRemove(req.params.cartId)
-      .then(cart => res.json(cart))
+      .then(cart => {
+        req.io.emit('refetch-data') // emit event to socket
+        res.json(cart)
+      })
       .catch(next)
   }
 }
