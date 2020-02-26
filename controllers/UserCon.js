@@ -99,49 +99,19 @@ class UserCon {
 
       result.travel = travel
 
-      if (!travel) {
-        carts = await Cart.find({ buyerId: req.payload.id })
-          .populate('buyerId', 'name email point')
-          .populate({
-            path: 'itemId',
-            populate: { path: 'ownerId', select: 'name email point' },
-          })
-          .populate({
-            path: 'travelId',
-            select: 'locationFrom locationTo departure userId',
-            populate: { path: 'userId', select: 'name email point' },
-          })
+      carts = await Cart.find({ buyerId: req.payload.id })
+        .populate('buyerId', 'name email point')
+        .populate({
+          path: 'itemId',
+          populate: { path: 'ownerId', select: 'name email point' },
+        })
+        .populate({
+          path: 'travelId',
+          select: 'locationFrom locationTo departure userId',
+          populate: { path: 'userId', select: 'name email point' },
+        })
 
-        result.carts = carts
-      } else {
-        carts = await Cart.find({ travelId: travel.id, status: 'open' })
-          .populate('buyerId', 'name email point')
-          .populate({
-            path: 'itemId',
-            populate: { path: 'ownerId', select: 'name email point' },
-          })
-          .populate({
-            path: 'travelId',
-            select: 'locationFrom locationTo departure userId',
-            populate: { path: 'userId', select: 'name email point' },
-          })
-
-        result.carts = carts
-
-        carts = await Cart.find({ buyerId: req.payload.id })
-          .populate('buyerId', 'name email point')
-          .populate({
-            path: 'itemId',
-            populate: { path: 'ownerId', select: 'name email point' },
-          })
-          .populate({
-            path: 'travelId',
-            select: 'locationFrom locationTo departure userId',
-            populate: { path: 'userId', select: 'name email point' },
-          })
-
-        result.carts = [...result.carts, ...carts]
-      }
+      result.carts = carts
 
       result.user = await User.findOne(
         { _id: req.payload.id },
