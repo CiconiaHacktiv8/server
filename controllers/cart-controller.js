@@ -169,10 +169,11 @@ class CartController {
       }
 
       let locations = item.location.split(',')
+      let locationsFrom = travel.locationFrom.split(',')
 
       if (
         locations[locations.length - 1].trim().toLowerCase() !==
-        travel.locationFrom.trim().toLowerCase()
+        locationsFrom[locationsFrom.length - 1].trim().toLowerCase()
       ) {
         return next({
           name: 'BadRequest',
