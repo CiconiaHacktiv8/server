@@ -168,7 +168,12 @@ class CartController {
         return next({ name: 'BadRequest', messages: ['You didnt have travel'] })
       }
 
-      if (item.location !== travel.locationFrom) {
+      let locations = item.location.split(',')
+
+      if (
+        locations[locations.length - 1].trim().toLowerCase() !==
+        travel.locationFrom.trim().toLowerCase()
+      ) {
         return next({
           name: 'BadRequest',
           messages: ['Item location different'],
