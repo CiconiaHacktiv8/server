@@ -13,7 +13,14 @@ const base64File = require('./base64file')
 
 chai.use(chaiHttp)
 
-let travelUser, travelToken, watchUser, watchToken, preOrderItem, requestItem, requestItem2, tempCart 
+let travelUser,
+  travelToken,
+  watchUser,
+  watchToken,
+  preOrderItem,
+  requestItem,
+  requestItem2,
+  tempCart
 
 describe('TESTING CART', function() {
   before(async function() {
@@ -36,79 +43,80 @@ describe('TESTING CART', function() {
 
     watchToken = generateToken({ id: watchUser.id })
 
-
-    //create travel with id user1   
-    await chai.request(app)
+    //create travel with id user1
+    await chai
+      .request(app)
       .post('/travels')
       .set('token', travelToken)
       .send({
-          locationFrom: 'Singapore',
-          locationTo: 'Indonesia',
-          departure: '2020-02-21',
-        })
-      .then((data) =>{
-        this.timeout(10000)
-          console.log('created travel')
+        locationFrom: 'Singapore',
+        locationTo: 'Indonesia',
+        departure: '2020-02-21',
       })
-      .catch(err=>{console.log(err)})
-    
+      .then(data => {
+        this.timeout(10000)
+      })
+      .catch(err => {})
+
     //create preOrder from user who have travel
-    await chai.request(app)
+    await chai
+      .request(app)
       .post('/items')
       .set('token', travelToken)
       .send({
-          name: 'item preOrder',
-          price: 99999,
-          quantity: 1,
-          imageName: 'testing.jpg',
-          base64: base64File,
-          status: 'travel', 
-          location: 'Singapore'
-        })
-      .then((data) =>{
-        this.timeout(10000)
-          preOrderItem = data.body
+        name: 'item preOrder',
+        price: 99999,
+        quantity: 1,
+        imageName: 'testing.jpg',
+        base64: base64File,
+        status: 'travel',
+        location: 'Singapore',
       })
-      .catch(err=>{console.log(err)})
+      .then(data => {
+        this.timeout(10000)
+        preOrderItem = data.body
+      })
+      .catch(err => {})
 
     //create request item
-    await chai.request(app)
+    await chai
+      .request(app)
       .post('/items')
       .set('token', watchToken)
       .send({
-          name: 'item request',
-          price: 10000,
-          quantity: 2,
-          imageName: 'testing.jpg',
-          base64: base64File,
-          status: 'watch', 
-          location: 'Singapore'
-        })
-      .then((data) =>{
-        this.timeout(10000)
-          requestItem = data.body
-      })
-      .catch(err=>{console.log(err)})
-
-    //create request item 2
-    await chai.request(app)
-    .post('/items')
-    .set('token', watchToken)
-    .send({
         name: 'item request',
         price: 10000,
         quantity: 2,
         imageName: 'testing.jpg',
         base64: base64File,
-        status: 'watch', 
-        location: 'Hongkong'
+        status: 'watch',
+        location: 'Singapore',
       })
-    .then((data) =>{
-      this.timeout(10000)
-        requestItem2 = data.body
-    })
-    .catch(err=>{console.log(err)})
+      .then(data => {
+        this.timeout(10000)
+        requestItem = data.body
+      })
+      .catch(err => {})
 
+    //create request item 2
+    await chai
+      .request(app)
+      .post('/items')
+      .set('token', watchToken)
+      .send({
+        name: 'item request',
+        price: 10000,
+        quantity: 2,
+        imageName: 'testing.jpg',
+        base64: base64File,
+        status: 'watch',
+        location: 'Hongkong',
+      })
+      .then(data => {
+        this.timeout(10000)
+        requestItem2 = data.body
+      })
+      .catch(err => {})
   })
 
   after(async function() {
@@ -127,11 +135,11 @@ describe('TESTING CART', function() {
           .post('/carts')
           .set('token', watchToken)
           .send({
-            travelId : preOrderItem.ownerId,
+            travelId: preOrderItem.ownerId,
             itemId: preOrderItem._id,
             quantity: 1,
             status: 'open',
-            fixPrice:preOrderItem.price
+            fixPrice: preOrderItem.price,
           })
         tempCart = response.body
         expect(response).to.have.status(201)
@@ -150,12 +158,12 @@ describe('TESTING CART', function() {
           .post('/carts')
           .set('token', watchToken)
           .send({
-            travelId : watchUser._id,
+            travelId: watchUser._id,
             itemId: requestItem._id,
             quantity: 1,
             status: 'offered',
-            fixPrice: requestItem.price
-        })
+            fixPrice: requestItem.price,
+          })
 
         expect(response).to.have.status(400)
         expect(response.body).to.be.an('object')
@@ -171,11 +179,11 @@ describe('TESTING CART', function() {
           .post('/carts')
           .set('token', travelToken)
           .send({
-            travelId : travelUser._id,
+            travelId: travelUser._id,
             itemId: requestItem._id,
             quantity: 1,
             status: 'offered',
-            fixPrice: requestItem.price
+            fixPrice: requestItem.price,
           })
 
         expect(response).to.have.status(201)
@@ -194,11 +202,11 @@ describe('TESTING CART', function() {
           .post('/carts')
           .set('token', travelToken)
           .send({
-            travelId : travelUser._id,
+            travelId: travelUser._id,
             itemId: requestItem2._id,
             quantity: 1,
             status: 'offered',
-            fixPrice: requestItem.price
+            fixPrice: requestItem.price,
           })
 
         expect(response).to.have.status(400)
@@ -206,26 +214,22 @@ describe('TESTING CART', function() {
         expect(response.body).to.have.property('errors')
         expect(response.body.errors[0]).to.equal('Item location different')
       })
-    })    
+    })
   })
   describe('2. Get Cart', function() {
-    describe('get all Cart',function(){
-      it('should return all cart - (code: 200)',async function(){
+    describe('get all Cart', function() {
+      it('should return all cart - (code: 200)', async function() {
         this.timeout(10000)
-        const response = await chai
-          .request(app)
-          .get(`/carts`)
+        const response = await chai.request(app).get(`/carts`)
 
         expect(response).to.have.status(200)
         expect(response.body).to.be.an('array')
       })
-    })    
-    describe('get one Cart',function(){
-      it('should return one cart - (code: 200)',async function(){
+    })
+    describe('get one Cart', function() {
+      it('should return one cart - (code: 200)', async function() {
         this.timeout(10000)
-        const response = await chai
-          .request(app)
-          .get(`/carts/${tempCart._id}`)
+        const response = await chai.request(app).get(`/carts/${tempCart._id}`)
 
         expect(response).to.have.status(200)
         expect(response.body).to.be.an('object')
@@ -236,20 +240,22 @@ describe('TESTING CART', function() {
         expect(response.body).to.have.property('status')
         expect(response.body).to.have.property('fixPrice')
       })
-      it('should return error- (code: 404)',async function(){
+      it('should return error- (code: 404)', async function() {
         this.timeout(10000)
         const response = await chai
           .request(app)
           .get(`/carts/${tempCart._id} + 123`)
         expect(response).to.have.status(404)
         expect(response.body).to.be.an('object')
-        expect(response.body).to.have.property('errors').equal('not found')
+        expect(response.body)
+          .to.have.property('errors')
+          .equal('not found')
       })
     })
-    describe('get Cart By User',function(){
-      after(async function(){
+    describe('get Cart By User', function() {
+      after(async function() {
         this.timeout(10000)
-         await chai
+        await chai
           .request(app)
           .patch(`/carts/${tempCart._id}`)
           .set('token', travelToken)
@@ -257,7 +263,7 @@ describe('TESTING CART', function() {
             status: 'open',
           })
       })
-      it('should return all cart user- (code: 200)',async function(){
+      it('should return all cart user- (code: 200)', async function() {
         this.timeout(10000)
         const response = await chai
           .request(app)
@@ -271,7 +277,7 @@ describe('TESTING CART', function() {
         expect(response.body).to.have.property('pendingPurchase')
         expect(response.body).to.have.property('pendingDelivery')
       })
-      it('should return all cart user- (code: 200)',async function(){
+      it('should return all cart user- (code: 200)', async function() {
         this.timeout(10000)
         const response = await chai
           .request(app)
@@ -285,24 +291,23 @@ describe('TESTING CART', function() {
         expect(response.body).to.have.property('pendingPurchase')
         expect(response.body).to.have.property('pendingDelivery')
       })
-      describe('pendingPurchase',function(){
-        before(async function(){
-        const respone =  await Cart.findOneAndUpdate(
+      describe('pendingPurchase', function() {
+        before(async function() {
+          const respone = await Cart.findOneAndUpdate(
             { _id: tempCart._id },
-            {status: 'pending purchase'},
+            { status: 'pending purchase' },
             { new: true },
           )
-            
-          tempCart = respone
-          })
-          it('should return all cart user on pendingPurchase- (code: 200)',async function(){
 
-            this.timeout(10000)
-            const response = await chai
+          tempCart = respone
+        })
+        it('should return all cart user on pendingPurchase- (code: 200)', async function() {
+          this.timeout(10000)
+          const response = await chai
             .request(app)
             .get(`/carts/user`)
             .set('token', watchToken)
-            
+
           expect(response).to.have.status(200)
           expect(response.body).to.be.an('object')
           expect(response.body).to.have.property('open')
@@ -311,24 +316,23 @@ describe('TESTING CART', function() {
           expect(response.body).to.have.property('pendingDelivery')
         })
       })
-      describe('pendingDelivery',function(){
-        before(async function(){
-        const respone =  await Cart.findOneAndUpdate(
+      describe('pendingDelivery', function() {
+        before(async function() {
+          const respone = await Cart.findOneAndUpdate(
             { _id: tempCart._id },
-            {status: 'pending delivery'},
+            { status: 'pending delivery' },
             { new: true },
           )
-            
-          tempCart = respone
-          })
-          it('should return all cart user on pendingDelivery- (code: 200)',async function(){
 
-            this.timeout(10000)
-            const response = await chai
+          tempCart = respone
+        })
+        it('should return all cart user on pendingDelivery- (code: 200)', async function() {
+          this.timeout(10000)
+          const response = await chai
             .request(app)
             .get(`/carts/user`)
             .set('token', watchToken)
-            
+
           expect(response).to.have.status(200)
           expect(response.body).to.be.an('object')
           expect(response.body).to.have.property('open')
@@ -337,10 +341,9 @@ describe('TESTING CART', function() {
           expect(response.body).to.have.property('pendingDelivery')
         })
       })
-
-    })    
-    describe('get Cart By Travel',function(){
-      it('should return all cart user- (code: 200)',async function(){
+    })
+    describe('get Cart By Travel', function() {
+      it('should return all cart user- (code: 200)', async function() {
         this.timeout(10000)
         const response = await chai
           .request(app)
@@ -349,7 +352,7 @@ describe('TESTING CART', function() {
         expect(response).to.have.status(200)
         expect(response.body).to.be.an('array')
       })
-      it('should return all cart user- (code: 200)',async function(){
+      it('should return all cart user- (code: 200)', async function() {
         this.timeout(10000)
         const response = await chai
           .request(app)
@@ -358,9 +361,9 @@ describe('TESTING CART', function() {
         expect(response).to.have.status(200)
         expect(response.body).to.be.an('array')
       })
-    })        
-    describe('get Cart With Status Offered',function(){
-      it('should return all cart with status offered- (code: 200)',async function(){
+    })
+    describe('get Cart With Status Offered', function() {
+      it('should return all cart with status offered- (code: 200)', async function() {
         this.timeout(10000)
         const response = await chai
           .request(app)
@@ -369,9 +372,9 @@ describe('TESTING CART', function() {
         expect(response).to.have.status(200)
         expect(response.body).to.be.an('array')
       })
-    })     
-    describe('get Cart With Status Open',function(){
-      it('should return all cart with status open- (code: 200)',async function(){
+    })
+    describe('get Cart With Status Open', function() {
+      it('should return all cart with status open- (code: 200)', async function() {
         this.timeout(10000)
         const response = await chai
           .request(app)
@@ -380,10 +383,10 @@ describe('TESTING CART', function() {
         expect(response).to.have.status(200)
         expect(response.body).to.be.an('array')
       })
-    })      
+    })
   })
-  describe('3. Edit Cart', function(){
-    it('should return all cart with status open- (code: 200)',async function(){
+  describe('3. Edit Cart', function() {
+    it('should return all cart with status open- (code: 200)', async function() {
       this.timeout(10000)
       const response = await chai
         .request(app)
@@ -395,9 +398,11 @@ describe('TESTING CART', function() {
 
       expect(response).to.have.status(200)
       expect(response.body).to.be.an('object')
-      expect(response.body).to.have.property('status').equal('offered')
-    }) 
-    it('should return all cart with status offered- (code: 200)',async function(){
+      expect(response.body)
+        .to.have.property('status')
+        .equal('offered')
+    })
+    it('should return all cart with status offered- (code: 200)', async function() {
       this.timeout(10000)
       const response = await chai
         .request(app)
@@ -411,7 +416,7 @@ describe('TESTING CART', function() {
       // expect(response.body).to.be.an('object')
       // expect(response.body).to.have.property('status').equal('pending purchase')
     })
-    it('should return all cart with status pending purchase- (code: 200)',async function(){
+    it('should return all cart with status pending purchase- (code: 200)', async function() {
       this.timeout(10000)
       const response = await chai
         .request(app)
@@ -423,9 +428,11 @@ describe('TESTING CART', function() {
 
       expect(response).to.have.status(200)
       expect(response.body).to.be.an('object')
-      expect(response.body).to.have.property('status').equal('pending delivery')
+      expect(response.body)
+        .to.have.property('status')
+        .equal('pending delivery')
     })
-    it('should return all cart with status pending delivery- (code: 200)',async function(){
+    it('should return all cart with status pending delivery- (code: 200)', async function() {
       this.timeout(10000)
       const response = await chai
         .request(app)
@@ -437,9 +444,11 @@ describe('TESTING CART', function() {
 
       expect(response).to.have.status(200)
       expect(response.body).to.be.an('object')
-      expect(response.body).to.have.property('status').equal('complete')
+      expect(response.body)
+        .to.have.property('status')
+        .equal('complete')
     })
-    it('should return error- (code: 404)',async function(){
+    it('should return error- (code: 404)', async function() {
       this.timeout(10000)
       const response = await chai
         .request(app)
@@ -450,15 +459,15 @@ describe('TESTING CART', function() {
         })
       expect(response).to.have.status(404)
       expect(response.body).to.be.an('object')
-      expect(response.body).to.have.property('errors').equal('not found')
-    })    
+      expect(response.body)
+        .to.have.property('errors')
+        .equal('not found')
+    })
   })
-  describe('4. Delete Cart', function(){
-    it('should return deleted cart- (code: 200)',async function(){
+  describe('4. Delete Cart', function() {
+    it('should return deleted cart- (code: 200)', async function() {
       this.timeout(10000)
-      const response = await chai
-        .request(app)
-        .delete(`/carts/${tempCart._id}`)
+      const response = await chai.request(app).delete(`/carts/${tempCart._id}`)
 
       expect(response).to.have.status(200)
       expect(response.body).to.be.an('object')
@@ -468,16 +477,17 @@ describe('TESTING CART', function() {
       expect(response.body).to.have.property('quantity')
       expect(response.body).to.have.property('status')
       expect(response.body).to.have.property('fixPrice')
-    })  
-    it('should return error- (code: 404)',async function(){
+    })
+    it('should return error- (code: 404)', async function() {
       this.timeout(10000)
       const response = await chai
         .request(app)
         .delete(`/carts/${tempCart._id} + 123`)
       expect(response).to.have.status(404)
       expect(response.body).to.be.an('object')
-      expect(response.body).to.have.property('errors').equal('not found')
-    })   
+      expect(response.body)
+        .to.have.property('errors')
+        .equal('not found')
+    })
   })
-
 })

@@ -151,7 +151,7 @@ describe('TESTING USER', function() {
   })
   describe('3. User profile', function() {
     before(async function() {
-    let respone = await chai
+      let respone = await chai
         .request(app)
         .post('/register')
         .send({
@@ -159,20 +159,17 @@ describe('TESTING USER', function() {
           email: 'testing2@email.com',
           password: 'testing',
         })
-        user = respone.body
+      user = respone.body
 
-    await chai.request(app)
-      .post('/travels')
-      .set('token', user.token)
-      .send({
+      await chai
+        .request(app)
+        .post('/travels')
+        .set('token', user.token)
+        .send({
           locationFrom: 'Singapore',
           locationTo: 'Indonesia',
           departure: '2020-02-21',
         })
-      .then((data) =>{
-        this.timeout(10000)
-      })
-      .catch(err=>{console.log(err)})
     })
 
     after(async function() {
@@ -195,7 +192,6 @@ describe('TESTING USER', function() {
         expect(response.body).to.have.property('travel')
         expect(response.body).to.have.property('user')
       })
-
     })
-  })  
+  })
 })
