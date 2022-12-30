@@ -28,7 +28,7 @@
     "express": "^4.17.1",
     "gcs-upload": "^1.2.0",
     "jsonwebtoken": "^8.5.1",
-    "mocha": "^7.0.1",
+    "mocha": "^10.2.0",
     "mongoose": "^5.9.1",
     "nyc": "^15.0.0",
     "xendit-node": "^1.0.2"
